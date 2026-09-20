@@ -45,27 +45,19 @@ export default function Hero({ recipientName, onOpenPersonalizer }) {
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
         <button
           onClick={() => scrollToSection('ramo')}
-          className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-sunflower-400 hover:bg-sunflower-500 text-stone-900 font-sans font-semibold text-sm sm:text-base shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
+          className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-sunflower-400 hover:bg-sunflower-500 text-stone-900 font-sans font-semibold text-sm sm:text-base shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
         >
           <span>🌻 Ver mi Ramo Floral</span>
           <ArrowDown className="w-4 h-4 text-stone-900" />
         </button>
 
         <button
-          onClick={() => scrollToSection('carta')}
-          className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-white hover:bg-amber-50 text-stone-800 border border-amber-200 font-sans font-medium text-sm sm:text-base shadow-sm hover:shadow hover:scale-105 active:scale-95 transition-all duration-200"
-        >
-          <Mail className="w-4 h-4 text-amber-700" />
-          <span>Leer Carta Secreta</span>
-        </button>
-
-        <button
           onClick={onOpenPersonalizer}
-          className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-amber-50/80 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs sm:text-sm font-sans font-medium transition-colors"
-          title="Personalizar nombres y mensaje"
+          className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white hover:bg-amber-50 text-stone-800 border border-amber-300 font-sans font-medium text-sm sm:text-base shadow-sm hover:shadow hover:scale-105 active:scale-95 transition-all duration-200"
+          title="Personalizar nombres y mensaje para regalar"
         >
-          <Edit3 className="w-3.5 h-3.5 text-amber-700" />
-          <span>Personalizar</span>
+          <Sparkles className="w-4 h-4 text-amber-600" />
+          <span>Personalizar & Regalar</span>
         </button>
       </div>
     </header>

@@ -2,16 +2,15 @@ import React, { useState, useEffect } from 'react';
 import PetalsCanvas from './components/PetalsCanvas';
 import Hero from './components/Hero';
 import InteractiveBouquet from './components/InteractiveBouquet';
-import PinterestBoard from './components/PinterestBoard';
-import EnvelopeLetter from './components/EnvelopeLetter';
 import MusicPlayer from './components/MusicPlayer';
 import ShareModal from './components/ShareModal';
 import { getInitialDedication } from './utils/urlParams';
-import { Heart, Sparkles, Share2, Flower2 } from 'lucide-react';
+import { Heart, Sparkles, Share2 } from 'lucide-react';
 
 export default function App() {
   const [dedication, setDedication] = useState(getInitialDedication);
   const [isPersonalizerOpen, setIsPersonalizerOpen] = useState(false);
+  const [bloomStage, setBloomStage] = useState(1);
 
   // Sync title with recipient
   useEffect(() => {
@@ -39,7 +38,7 @@ export default function App() {
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setIsPersonalizerOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-sunflower-200 hover:bg-sunflower-300 text-sunflower-900 text-xs sm:text-sm font-semibold transition-all shadow-sm"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-sunflower-300 hover:bg-sunflower-400 text-sunflower-950 text-xs sm:text-sm font-semibold transition-all shadow-sm hover:scale-105 active:scale-95"
               title="Personalizar nombres y dedicatoria"
             >
               <Share2 className="w-3.5 h-3.5" />
@@ -57,23 +56,12 @@ export default function App() {
           onOpenPersonalizer={() => setIsPersonalizerOpen(true)}
         />
 
-        {/* Section 2: Interactive Bouquet */}
+        {/* Section 2: Interactive Bouquet (The Hunger Games Edition) */}
         <section id="ramo" className="scroll-mt-16">
-          <InteractiveBouquet recipientName={dedication.to} />
-        </section>
-
-        {/* Section 3: Pinterest Moodboard Scrapbook */}
-        <section id="moodboard" className="scroll-mt-16">
-          <PinterestBoard recipientName={dedication.to} />
-        </section>
-
-        {/* Section 4: Wax Sealed Envelope with Letter */}
-        <section id="carta" className="scroll-mt-16">
-          <EnvelopeLetter
+          <InteractiveBouquet
             recipientName={dedication.to}
-            senderName={dedication.from}
-            message={dedication.message}
-            date={dedication.date}
+            bloomStage={bloomStage}
+            onStageChange={setBloomStage}
           />
         </section>
       </main>
@@ -97,8 +85,8 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Floating Retro Vinyl Audio Player */}
-      <MusicPlayer />
+      {/* Floating Retro Vinyl Audio Player (Sincronizado dinámicamente con las canciones) */}
+      <MusicPlayer bloomStage={bloomStage} />
 
       {/* Modal for Personalizing Names and Link Sharing */}
       <ShareModal
