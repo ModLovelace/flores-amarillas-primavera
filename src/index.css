@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    background-color: #fdfbf7;
+    background-image: 
+      radial-gradient(#fde04718 1px, transparent 1px),
+      radial-gradient(#facc1510 1px, #fdfbf7 1px);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+  }
+
+  /* Custom Aesthetic Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #fdfbf7;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #fde047;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #facc15;
+  }
+}
+
+/* Washi Tape aesthetic ribbon */
+.washi-tape {
+  background: rgba(254, 240, 138, 0.65);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(1px);
+  position: relative;
+}
+
+.washi-tape-pink {
+  background: rgba(252, 231, 243, 0.7);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(1px);
+}
+
+.washi-tape-sage {
+  background: rgba(220, 252, 231, 0.7);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(1px);
+}
+
+/* Polaroid 3D Flip Card */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Spinning Vinyl Animation */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-spin-paused {
+  animation-play-state: paused;
+}
+
+/* Modern discrete animation transitions */
+.fade-in-entry {
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  transition-behavior: allow-discrete;
+}
+
+@starting-style {
+  .fade-in-entry {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+}
+
+/* Soft paper shadow */
+.shadow-paper {
+  box-shadow: 0 10px 30px -5px rgba(180, 83, 9, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+}
+
+.shadow-polaroid {
+  box-shadow: 0 8px 25px -4px rgba(0, 0, 0, 0.08), 0 3px 10px -2px rgba(0, 0, 0, 0.04);
+}
