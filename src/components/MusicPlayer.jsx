@@ -33,7 +33,7 @@ export default function MusicPlayer({ bloomStage = 1 }) {
 
   return (
     <aside
-      aria-label="Banda Sonora de Los Juegos del Hambre"
+      aria-label="Banda Sonora de Primavera & Flores Amarillas"
       className="fixed bottom-4 right-3 sm:bottom-5 sm:right-6 z-40 flex items-center gap-2.5 sm:gap-3 bg-white/95 backdrop-blur-md pl-2.5 pr-3 sm:pl-3 sm:pr-4 py-2 sm:py-2.5 rounded-full border border-amber-300 shadow-polaroid hover:shadow-xl transition-all duration-300 max-w-[calc(100vw-1.5rem)] sm:max-w-none"
     >
       {/* Vinyl Disc Icon with spin & stage color */}
@@ -43,7 +43,7 @@ export default function MusicPlayer({ bloomStage = 1 }) {
         }`}
         style={{ borderColor: currentTrack.vinylColor }}
         onClick={handleToggle}
-        title={isPlaying ? 'Pausar música' : `Reproducir tema de ${currentTrack.movie}`}
+        title={isPlaying ? 'Pausar música' : `Reproducir melodía de ${currentTrack.movie}`}
       >
         <div
           className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border border-stone-800 flex items-center justify-center transition-colors duration-500"

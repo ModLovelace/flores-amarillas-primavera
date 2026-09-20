@@ -56,7 +56,7 @@ export default function App() {
           onOpenPersonalizer={() => setIsPersonalizerOpen(true)}
         />
 
-        {/* Section 2: Interactive Bouquet (The Hunger Games Edition) */}
+        {/* Section 2: Interactive Bouquet (Edición Flores Amarillas & Día de la Primavera) */}
         <section id="ramo" className="scroll-mt-16">
           <InteractiveBouquet
             recipientName={dedication.to}

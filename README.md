@@ -1,6 +1,6 @@
 # 🌻 Regala Flores Amarillas & Feliz Día de la Primavera
 
-Una experiencia web interactiva, estética y romántica creada para celebrar el **Día de la Primavera** y la tradición de regalar **Flores Amarillas** (21 de Septiembre), con el ramo temático y banda sonora de *Los Juegos del Hambre*.
+Una experiencia web interactiva, estética y romántica creada para celebrar el **Día de la Primavera** y la tradición de regalar **Flores Amarillas** (21 de Septiembre). Diseñada para que cualquier persona pueda personalizar un ramo virtual, escuchar dulces melodías acústicas y compartirlo con su persona favorita.
 
 ---
 
@@ -12,26 +12,28 @@ Una experiencia web interactiva, estética y romántica creada para celebrar el 
 
 - 💛 **Edición Especial Personalizada (Rama `personal`)**:  
   👉 **[https://cristtel-con-amor-flores-amarillas.vercel.app](https://cristtel-con-amor-flores-amarillas.vercel.app)**  
-  *(Incluye el Scrapbook Polaroid 3D con poema y la Carta Secreta con sello de cera vintage)*
+  *(Incluye temática dedicada, Scrapbook Polaroid 3D con poema y la Carta Secreta con sello de cera vintage)*
 
 ---
 
 ## ✨ Características de esta Versión (`main`)
 
-- 🌻 **Ramo Floral Interactivo de Los Juegos del Hambre**:
-  - **Fase 1 (Distrito 12 & Peeta)**: Dientes de león dorados resplandecientes, prímulas tiernas silvestres y espigas doradas de cebada.
-  - **Fase 2 (En Llamas - Catching Fire)**: Helechos frondosos del Vasallaje de los 25, orquídeas tropicales y la rosa silvestre con pétalos aterciopelados.
-  - **Fase 3 (Balada de Pájaros Cantores & Rue)**: Flores amarillas de ruda con una mariquita detallada (símbolo de ternura y lealtad) y margaritas silvestres del lago de los Covey.
+- 🌻 **Ramo Floral Interactivo de Primavera**:
+  - **Fase 1 (Primeros Brotes & Margaritas)**: Dientes de león dorados resplandecientes, tiernas margaritas acariciadas por el sol y espigas doradas de primavera.
+  - **Fase 2 (Girasoles & Rosas Silvestres)**: Girasoles radiantes, rosas doradas aterciopeladas y hojas verdes frescas en floración.
+  - **Fase 3 (Jardín de Amor & Follaje)**: Flores silvestres doradas, helechos esmeralda y una mariquita de la buena suerte.
+  - **Fase 4 (Eterna Primavera Radiante)**: Floración plena con mariposas doradas revoloteando, aura solar brillante y semillas de diente de león al viento.
 - 🎶 **Banda Sonora Sintetizada (Web Audio API)**:
-  - *Rue's Lullaby* (Nana de Rue) en modo campanas celestes.
-  - *The Hanging Tree* (El Árbol del Ahorcado) en modo arpa folk.
-  - *Horn of Plenty* (Himno de Panem) en modo himno épico.
-  - Reproductor vinilo retro flotante con cambio de color según la película activa y reproducción automática sincronizada al regar/florecer.
-- 🌸 **Lluvia Interactiva de Pétalos**: Pétalos dorados flotando con física y respuesta suave al cursor y al tacto en pantallas móviles.
+  - *Flores Amarillas (Vals de Primavera)* en campanas y celesta suave.
+  - *Arpegio de los Girasoles* en arpa y acordes cálidos de amor.
+  - *Sonrisa de Primavera* en guitarra acústica y brisa primaveral.
+  - *El Florecer de la Esperanza* con armonías triunfales de alegría y luz.
+  - Reproductor vinilo retro flotante con cambio de color y sincronización automática al regar/florecer.
+- 🌸 **Lluvia Interactiva de Pétalos**: Pétalos dorados flotando con física suave y respuesta al cursor y al tacto en pantallas móviles.
 - 🔗 **Personalizador de Enlaces & Compartir por WhatsApp**:
-  - Modal para ingresar el nombre de la persona especial (`?to=Nombre`).
+  - Modal intuitivo para ingresar el nombre de la persona especial (`?to=Nombre`).
   - Genera automáticamente el mensaje y enlace para enviar por WhatsApp o copiar al portapapeles.
-- 📱 **Diseño 100% Responsivo**: Optimizado para dispositivos móviles y escritorio con animaciones fluidas a 60 FPS.
+- 📱 **Diseño 100% Responsivo**: Optimizado para dispositivos móviles y escritorio con animaciones botánicas orgánicas y fluidas.
 
 ---
 
@@ -54,8 +56,8 @@ npm run build
 
 | Rama | Descripción | Despliegue en Vercel |
 |---|---|---|
-| `main` | Versión pública con generador de enlaces para que cualquiera pueda regalar flores amarillas personalizadas | [regala-flores-amarillas.vercel.app](https://regala-flores-amarillas.vercel.app) |
-| `personal` | Edición romántica exclusiva con Polaroids 3D, poema parafraseado y carta con sello de cera | [cristtel-con-amor-flores-amarillas.vercel.app](https://cristtel-con-amor-flores-amarillas.vercel.app) |
+| `main` | Versión pública estándar con generador de enlaces para que cualquiera pueda regalar flores amarillas personalizadas | [regala-flores-amarillas.vercel.app](https://regala-flores-amarillas.vercel.app) |
+| `personal` | Edición romántica exclusiva con temática dedicada, Polaroids 3D con poema y carta con sello de cera | [cristtel-con-amor-flores-amarillas.vercel.app](https://cristtel-con-amor-flores-amarillas.vercel.app) |
 
 ---
 
@@ -65,5 +67,5 @@ npm run build
 - **Tailwind CSS**
 - **Lucide Icons**
 - **Canvas Confetti**
-- **Web Audio API** (música ambiental y campanas sin archivos externos pesados)
+- **Web Audio API** (música ambiental sintetizada en tiempo real, cero dependencias de audio externas y libre de copyright)
 - **Vercel** para despliegue global ultra-rápido

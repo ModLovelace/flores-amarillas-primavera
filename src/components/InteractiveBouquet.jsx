@@ -30,68 +30,68 @@ export default function InteractiveBouquet({
     };
   }, []);
 
-  const hungerGamesNotes = [
-    '🌼 "Lo que necesito es el diente de león en primavera..."',
-    '✨ El amarillo que significa que la vida florece de nuevo',
-    '🐞 Una mariquita en la ruda para la más dulce y leal',
-    '🏹 Katniss: Saeta de agua indomable y hermosa',
-    '🌸 Prímula: La ternura más pura de mi corazón',
-    '🔥 Eres la chica en llamas que ilumina mi universo',
-    '🕊️ El Sinsajo que vuela libre hacia la primavera',
-    '💛 Contigo la esperanza nunca muere, renace más fuerte'
+  const springLoveNotes = [
+    '🌻 ¡Que nunca te falten flores amarillas en tu vida!',
+    '✨ Eres la luz y la calidez más hermosa de esta primavera',
+    '💛 Un ramo dorado para recordarte lo especial que eres',
+    '🌼 Donde florecen las flores, florece la alegría y el amor',
+    '🌷 Tu sonrisa ilumina el mundo como el sol primaveral',
+    '💫 "Ella sabía que vendría a buscarla con sus flores amarillas..."',
+    '🦋 Que cada pétalo te traiga momentos de felicidad',
+    '🌟 Gracias por existir y llenar de color cada día'
   ];
 
   const stageDescriptions = [
     {
-      movie: '1. Los Juegos del Hambre',
-      name: 'Distrito 12 & Peeta',
-      desc: 'Dientes de león dorados y prímulas tiernas brotando tras el frío',
-      badge: '🌼 Diente de León & Prímula'
+      movie: 'Fase 1',
+      name: 'Primeros Brotes & Margaritas',
+      desc: 'Dientes de león dorados y tiernas margaritas acariciadas por el sol',
+      badge: '🌼 Diente de León & Margaritas'
     },
     {
-      movie: '2. En Llamas (Catching Fire)',
-      name: 'La Selva del Reloj & La Rosa',
-      desc: 'Helechos frondosos del Vasallaje, orquídeas y la rosa silvestre',
-      badge: '🌿 Selva Tropical & Rosa Blanca'
+      movie: 'Fase 2',
+      name: 'Girasoles & Rosas Silvestres',
+      desc: 'Girasoles radiantes, rosas doradas aterciopeladas y hojas en flor',
+      badge: '🌻 Girasol & Rosa Silvestre'
     },
     {
-      movie: '3. Balada de Pájaros Cantores',
-      name: 'Los Covey & Rue',
-      desc: 'Flores de ruda con su mariquita y margaritas silvestres del lago',
-      badge: '🐞 Ruda, Mariquita & Margaritas'
+      movie: 'Fase 3',
+      name: 'Jardín de Amor & Follaje',
+      desc: 'Flores silvestres doradas, mariquitas de la suerte y follaje esmeralda',
+      badge: '🐞 Flores Silvestres & Mariquita'
     },
     {
-      movie: '4. Sinsajo (Mockingjay)',
-      name: 'El Renacer de Katniss',
-      desc: 'Saetas de agua blancas en flor plena, vuelo del Sinsajo y semillas al viento',
-      badge: '🏹 Saeta de Agua & Sinsajo'
+      movie: 'Fase 4',
+      name: 'Eterna Primavera Radiante',
+      desc: 'Floración total con mariposas doradas, brillo solar y pétalos al viento',
+      badge: '✨ Eterna Primavera'
     },
   ];
 
   const stageQuotes = [
     {
       stage: 1,
-      tag: 'Los Juegos del Hambre · Distrito 12',
-      quote: '“El chico del pan me dio esperanza cuando la lluvia caía y parecía no haber futuro. Y al día siguiente, en la pradera, vi el primer diente de león. Supe que la primavera siempre regresa para quien sabe esperar.”',
-      author: '— Katniss Everdeen & Peeta Mellark · Libro 1'
+      tag: '21 de Septiembre · El Despertar del Sol',
+      quote: '“Dicen que regalar flores amarillas el 21 de septiembre es prometer luz, alegría y desearle a quien las recibe que nunca le falte un motivo para sonreír.”',
+      author: '— Tradición de Primavera'
     },
     {
       stage: 2,
-      tag: 'En Llamas (Catching Fire) · La Selva del Reloj',
-      quote: '“Recuerda quién es el verdadero enemigo. Ni el reloj del Vasallaje, ni las trampas de la arena, ni la rosa de Snow apagarán la chispa de lo que sentimos. Nuestro amor es la única primavera que florece en medio de la tormenta.”',
-      author: '— En Llamas · El Vasallaje de los Veinticinco'
+      tag: 'Flores Amarillas · Promesa de Amor',
+      quote: '“Ella sabía que él sabía, que algún día pasaría, que vendría a buscarla con sus flores amarillas... porque el cariño verdadero siempre encuentra el camino para florecer.”',
+      author: '— Himno de las Flores Amarillas'
     },
     {
       stage: 3,
-      tag: 'Balada de Pájaros Cantores & Rue',
-      quote: '“Las cosas más hermosas nacen en silencio. Entre la ruda y las margaritas silvestres del lago de los Covey, una mariquita descansa y el sinsajo entona su canto libre: la dulzura y la lealtad jamás se extinguen.”',
-      author: '— Balada de Pájaros Cantores & El Tributo de Rue'
+      tag: 'Jardín de Primavera · Esperanza y Vida',
+      quote: '“El amarillo es el color de la luz, de la energía que renace y de la felicidad compartida. Donde florece una flor amarilla, siempre florece un nuevo comienzo lleno de dicha.”',
+      author: '— Poesía Primaveral'
     },
     {
       stage: 4,
-      tag: 'Sinsajo (Mockingjay) · El Renacer Final',
-      quote: '“Lo que necesito para sobrevivir es el diente de león en primavera. El amarillo brillante que significa renacer en lugar de destrucción. La promesa de que la vida puede continuar y volver a ser buena. Y solo tú puedes darme eso.”',
-      author: '— Los Juegos del Hambre · Sinsajo (Epílogo)'
+      tag: 'Plena Floración · Amor y Gratitud',
+      quote: '“La primavera no empieza en una fecha del calendario; empieza cada vez que personas maravillosas llenan de color y calidez la vida de quienes las rodean.”',
+      author: '— Celebración de la Primavera'
     },
   ];
 
@@ -118,7 +118,7 @@ export default function InteractiveBouquet({
     if (noteTimeoutRef.current) {
       clearTimeout(noteTimeoutRef.current);
     }
-    const note = hungerGamesNotes[bloomCount % hungerGamesNotes.length];
+    const note = springLoveNotes[bloomCount % springLoveNotes.length];
     setActiveNote({
       id: Date.now(),
       text: note,
@@ -169,10 +169,10 @@ export default function InteractiveBouquet({
 
       {/* Header Tag */}
       <div className="inline-flex items-center justify-center text-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-amber-100/95 border border-amber-300 text-amber-950 text-xs sm:text-sm font-sans tracking-wide uppercase font-semibold shadow-sm mb-3 max-w-full flex-wrap">
-        <span className="text-base">🏹</span>
-        <span>Ramo Frondoso de Los Juegos del Hambre</span>
+        <span className="text-base">🌻</span>
+        <span>Ramo de Flores Amarillas</span>
         <span className="hidden sm:inline text-amber-600">·</span>
-        <span className="text-sunflower-700 font-bold">Panem en Primavera</span>
+        <span className="text-sunflower-700 font-bold">21 de Septiembre · Día de la Primavera</span>
       </div>
 
       {/* Stage Indicator Pill with Movie Label */}
@@ -271,28 +271,36 @@ export default function InteractiveBouquet({
           </div>
         )}
 
-        {/* 🏹 ANIMATION 1: Golden Mockingjay Spiral Flight */}
+        {/* 🦋 ANIMATION: Golden Butterfly Spiral Flight */}
         {bloomStage >= 4 && (
           <div className="absolute inset-0 pointer-events-none z-40 flex items-center justify-center">
             <div className="animate-mockingjay-flight">
-              <svg width="48" height="48" viewBox="0 0 64 64" className="filter drop-shadow-[0_0_12px_rgba(234,179,8,0.85)]">
-                {/* Golden Mockingjay Bird with flapping wings */}
-                <g fill="#FDE047" stroke="#B45309" strokeWidth="1.2">
-                  {/* Arrow in beak */}
-                  <line x1="12" y1="52" x2="52" y2="12" stroke="#CA8A04" strokeWidth="2.5" strokeLinecap="round" />
-                  {/* Body */}
-                  <ellipse cx="32" cy="32" rx="7" ry="14" fill="#FACC15" transform="rotate(35 32 32)" />
-                  {/* Head & Beak */}
-                  <circle cx="42" cy="22" r="5" fill="#FDE047" />
-                  <polygon points="45,20 54,16 43,24" fill="#EAB308" />
+              <svg width="46" height="46" viewBox="0 0 64 64" className="filter drop-shadow-[0_0_12px_rgba(234,179,8,0.85)]">
+                {/* Golden Butterfly with flapping wings */}
+                <g transform="translate(32, 32)">
+                  {/* Butterfly body */}
+                  <ellipse cx="0" cy="0" rx="3" ry="12" fill="#78350F" />
+                  <circle cx="0" cy="-14" r="3" fill="#451A03" />
+                  {/* Antennae */}
+                  <path d="M-1 -16 Q-7 -22 -11 -21" stroke="#451A03" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+                  <path d="M1 -16 Q7 -22 11 -21" stroke="#451A03" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+                  <circle cx="-11" cy="-21" r="1.2" fill="#F59E0B" />
+                  <circle cx="11" cy="-21" r="1.2" fill="#F59E0B" />
                   {/* Left Wing Flapping */}
-                  <path d="M28 30 Q12 12 30 6 Q28 20 28 30 Z" fill="#FEF08A" className="mj-wing-l" />
+                  <g className="mj-wing-l">
+                    <path d="M-2 -8 C-22 -26 -36 -6 -22 10 C-14 18 -4 4 -2 0 Z" fill="#FDE047" stroke="#CA8A04" strokeWidth="1" />
+                    <path d="M-2 2 C-18 8 -22 22 -12 26 C-4 26 -2 12 -2 2 Z" fill="#FACC15" stroke="#CA8A04" strokeWidth="0.8" />
+                    <circle cx="-16" cy="-4" r="3" fill="#F59E0B" opacity="0.8" />
+                    <circle cx="-10" cy="14" r="2.2" fill="#F59E0B" opacity="0.8" />
+                  </g>
                   {/* Right Wing Flapping */}
-                  <path d="M36 34 Q54 48 38 56 Q36 44 36 34 Z" fill="#FACC15" className="mj-wing-r" />
-                  {/* Tail Feathers */}
-                  <path d="M26 40 L16 56 L24 46 L14 58 L28 42 Z" fill="#EAB308" />
+                  <g className="mj-wing-r">
+                    <path d="M2 -8 C22 -26 36 -6 22 10 C14 18 4 4 2 0 Z" fill="#FDE047" stroke="#CA8A04" strokeWidth="1" />
+                    <path d="M2 2 C18 8 22 22 12 26 C4 26 2 12 2 2 Z" fill="#FACC15" stroke="#CA8A04" strokeWidth="0.8" />
+                    <circle cx="16" cy="-4" r="3" fill="#F59E0B" opacity="0.8" />
+                    <circle cx="10" cy="14" r="2.2" fill="#F59E0B" opacity="0.8" />
+                  </g>
                 </g>
-                <circle cx="32" cy="32" r="28" fill="none" stroke="#FDE047" strokeWidth="1" strokeDasharray="3 3" opacity="0.6" />
               </svg>
             </div>
           </div>
@@ -343,7 +351,7 @@ export default function InteractiveBouquet({
           </div>
         )}
 
-        {/* ================= SVG LUSH HUNGER GAMES BOUQUET ================= */}
+        {/* ================= SVG LUSH SPRING BOUQUET ================= */}
         <div className="w-full h-full animate-gentle-breeze origin-bottom flex items-center justify-center">
           <svg
             viewBox="0 0 440 480"
@@ -359,7 +367,7 @@ export default function InteractiveBouquet({
                 : 'drop-shadow-[0_0_35px_rgba(250,204,21,0.65)] brightness-115'
             }`}
             onClick={triggerBloom}
-            title="Toca para regar y hacer florecer el ramo de Los Juegos del Hambre"
+            title="Toca para regar y hacer florecer el ramo de flores amarillas"
           >
           <defs>
             {/* Gradients */}
@@ -501,19 +509,20 @@ export default function InteractiveBouquet({
             />
             <path d="M150 285 L220 455 L245 295 Z" fill="#D5BEA6" opacity="0.6" />
 
-            {/* Posy Ribbon with Sinsajo / Mockingjay Emblem Knot */}
-            <g id="posy-mockingjay-ribbon" transform="translate(220, 365)">
+            {/* Posy Ribbon with Golden Daisy Brooch Knot */}
+            <g id="posy-golden-ribbon" transform="translate(220, 365)">
               <ellipse cx="-20" cy="-2" rx="22" ry="12" fill="#FDE047" stroke="#CA8A04" strokeWidth="1.5" transform="rotate(-15 -20 -2)" />
               <ellipse cx="20" cy="-2" rx="22" ry="12" fill="#FDE047" stroke="#CA8A04" strokeWidth="1.5" transform="rotate(15 20 -2)" />
               
               <circle cx="0" cy="0" r="16" fill="#D97706" stroke="#FEF08A" strokeWidth="2.5" />
 
-              {/* Sinsajo Emblem */}
-              <g transform="scale(0.65) translate(-13, -13)">
-                <line x1="-10" y1="28" x2="38" y2="-6" stroke="#FEF08A" strokeWidth="2.5" strokeLinecap="round" />
-                <ellipse cx="12" cy="12" rx="6" ry="10" fill="#FEF08A" transform="rotate(30 12 12)" />
-                <path d="M10 10 Q0 -6 18 -9 Q14 4 10 10 Z" fill="#FEF08A" />
-                <path d="M12 12 Q26 2 30 -6 Q22 5 12 12 Z" fill="#FEF08A" />
+              {/* Golden Daisy Brooch Center */}
+              <g transform="scale(0.85)">
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
+                  <circle key={`ribbon-petal-${deg}`} cx="0" cy="-9" r="3.5" fill="#FEF9C3" stroke="#F59E0B" strokeWidth="0.5" transform={`rotate(${deg})`} />
+                ))}
+                <circle cx="0" cy="0" r="6" fill="#CA8A04" />
+                <circle cx="0" cy="0" r="3" fill="#FEF08A" />
               </g>
 
               {/* Ribbon tails */}
@@ -541,9 +550,9 @@ export default function InteractiveBouquet({
             <circle cx="0" cy="0" r="4" fill="#FACC15" />
           </g>
 
-          {/* LAYER 4: FLOWER - Margaritas del Lago de los Covey (Lucy Gray) */}
+          {/* LAYER 4: FLOWER - Margaritas Amarillas Silvestres */}
           <g
-            id="flower-covey-daisy"
+            id="flower-spring-daisy"
             className={`transition-all duration-1200 ease-out origin-[285px_195px] ${
               bloomStage >= 3 ? 'opacity-100 scale-100 rotate-[18deg]' : 'opacity-0 scale-35 rotate-[36deg]'
             }`}
@@ -556,7 +565,7 @@ export default function InteractiveBouquet({
             <circle cx="0" cy="0" r="5" fill="#CA8A04" />
           </g>
 
-          {/* LAYER 5: FLOWER - Prímula Amarilla (Prim - District 12) */}
+          {/* LAYER 5: FLOWER - Prímula Amarilla de Primavera */}
           <g
             id="flower-primrose"
             className="transition-all duration-1000 ease-out origin-[135px_140px]"
@@ -580,9 +589,9 @@ export default function InteractiveBouquet({
             <circle cx="0" cy="0" r="3" fill="#FEF08A" />
           </g>
 
-          {/* LAYER 6: FLOWER - Ruda con Mariquita (Rue - District 11) */}
+          {/* LAYER 6: FLOWER - Flor Silvestre con Mariquita de la Suerte */}
           <g
-            id="flower-rue-ladybug"
+            id="flower-wild-ladybug"
             className={`transition-all duration-1000 ease-out origin-[305px_145px] ${
               bloomStage >= 3 ? 'opacity-100' : 'opacity-85'
             }`}
@@ -616,9 +625,9 @@ export default function InteractiveBouquet({
             ))}
             <circle cx="0" cy="0" r="6" fill="#65A30D" />
 
-            {/* 🐞 LA MARIQUITA DE RUE */}
+            {/* 🐞 LA MARIQUITA DE LA SUERTE */}
             <g
-              id="rue-ladybug"
+              id="spring-ladybug"
               className="transition-transform duration-1000"
               transform={`translate(${bloomStage >= 2 ? 15 : 6}, ${bloomStage >= 2 ? -18 : -8}) rotate(${
                 bloomStage >= 3 ? 28 : 12
@@ -642,9 +651,9 @@ export default function InteractiveBouquet({
             </g>
           </g>
 
-          {/* LAYER 7: FLOWER CENTERPIECE - Diente de León de Peeta (Radiante y Frondoso) */}
+          {/* LAYER 7: FLOWER CENTERPIECE - Girasol Radiante & Diente de León Dorado */}
           <g
-            id="flower-peeta-dandelion"
+            id="flower-sunflower-center"
             className="transition-all duration-1200 ease-out origin-[220px_105px]"
             transform={`translate(220, 105) scale(${
               bloomStage === 1 ? 0.92 : bloomStage === 2 ? 1.04 : bloomStage === 3 ? 1.16 : 1.25
@@ -710,9 +719,9 @@ export default function InteractiveBouquet({
             <circle cx="0" cy="0" r="5" fill="#A16207" />
           </g>
 
-          {/* LAYER 8: FOREGROUND FLOWER - Saeta de Agua de Katniss (Sinsajo Rebirth) */}
+          {/* LAYER 8: FOREGROUND FLOWER - Lirio Silvestre Blanco & Oro */}
           <g
-            id="flower-katniss-arrowhead"
+            id="flower-white-lily"
             className={`transition-all duration-1000 ease-out origin-[220px_230px] ${
               bloomStage >= 2 ? 'opacity-100' : 'opacity-85'
             }`}
@@ -784,10 +793,10 @@ export default function InteractiveBouquet({
 
         <p className="text-sm sm:text-base text-stone-600 font-handwriting text-xl text-center">
           {bloomCount === 0 ? (
-            'Toca para regar: las flores brotarán y comenzará a sonar la canción de cada película'
+            'Toca para regar: las flores brotarán y comenzará a sonar una melodía primaveral'
           ) : (
             <span className="text-amber-900 font-semibold">
-              🌻 Has hecho florecer el ramo de Panem {bloomCount} {bloomCount === 1 ? 'vez' : 'veces'} para {recipientName} 💛
+              🌻 Has hecho florecer este hermoso ramo {bloomCount} {bloomCount === 1 ? 'vez' : 'veces'} para {recipientName} 💛
             </span>
           )}
         </p>

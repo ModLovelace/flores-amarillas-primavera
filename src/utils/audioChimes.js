@@ -114,7 +114,7 @@ function playAcousticNote(ctx, freq, time, duration = 0.8, volume = 0.05, type =
 }
 
 /**
- * Play Rue's iconic 4-note Mockingjay whistle
+ * Play cheerful 4-note Spring Songbird whistle
  */
 export function playRueWhistleAndBloom(stage = 1) {
   try {
@@ -268,35 +268,35 @@ export function playFlipSound() {
 export const MOVIE_TRACKS = [
   {
     stage: 1,
-    movie: 'Los Juegos del Hambre',
-    title: 'Deep in the Meadow (Rue\'s Lullaby)',
-    subtitle: 'Nana acústica del Distrito 12',
+    movie: 'Primavera en Flor',
+    title: 'Flores Amarillas (Vals de Primavera)',
+    subtitle: 'Campanas y celesta suave',
     vinylColor: '#FACC15',
-    tag: '🌼 Peeta & Prim'
+    tag: '🌼 Dientes de León & Sol'
   },
   {
     stage: 2,
-    movie: 'En Llamas (Catching Fire)',
-    title: 'Atlas & Arena Theme',
-    subtitle: 'Arpegios de la Selva del Reloj',
+    movie: 'Luz de Septiembre',
+    title: 'Arpegio de los Girasoles',
+    subtitle: 'Arpa y acordes cálidos de amor',
     vinylColor: '#F97316',
-    tag: '🌿 Selva & Rosa'
+    tag: '🌻 Girasoles & Rosas'
   },
   {
     stage: 3,
-    movie: 'Balada de Pájaros Cantores',
-    title: 'The Ballad of Lucy Gray Baird',
-    subtitle: 'Guitarra folk de los Covey',
+    movie: 'Jardín Silvestre',
+    title: 'Sonrisa de Primavera',
+    subtitle: 'Guitarra acústica y brisa cálida',
     vinylColor: '#84CC16',
-    tag: '🐞 Ruda & Mariquita'
+    tag: '🌿 Follaje & Margaritas'
   },
   {
     stage: 4,
-    movie: 'Sinsajo (Mockingjay)',
-    title: 'The Hanging Tree (Renacer en Primavera)',
-    subtitle: 'Himno de esperanza y dientes de león',
+    movie: 'Eterna Primavera',
+    title: 'El Florecer de la Esperanza',
+    subtitle: 'Melodía triunfal de luz y alegría',
     vinylColor: '#EAB308',
-    tag: '🏹 Sinsajo & Rebirth'
+    tag: '✨ Primavera Dorada'
   },
 ];
 
@@ -329,7 +329,7 @@ function playStageMelody(stage) {
   const now = ctx.currentTime;
 
   if (stage === 1) {
-    // 🌼 Movie 1: "Deep in the Meadow" (Rue's Lullaby) - Gentle lullaby celesta & harp
+    // 🌼 Melodía 1: "Flores Amarillas (Vals de Primavera)" - Gentle celesta & harp
     const notes = [
       { f: 293.66, t: 0.0, d: 0.9, v: 0.055 }, // D4
       { f: 369.99, t: 0.6, d: 0.8, v: 0.055 }, // F#4
@@ -343,7 +343,7 @@ function playStageMelody(stage) {
     playAcousticNote(ctx, 146.83, now, 4.5, 0.03, 'triangle');
     notes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
   } else if (stage === 2) {
-    // 🌿 Movie 2: "Atlas & Arena Theme" (En Llamas) - Flowing emotional chords
+    // 🌿 Melodía 2: "Arpegio de los Girasoles" - Flowing warm acoustic chords
     const bmMid = [246.94, 293.66, 369.99, 440.00];
     const gMid = [196.00, 246.94, 293.66, 392.00];
     const dMid = [220.00, 293.66, 369.99, 440.00];
@@ -356,7 +356,7 @@ function playStageMelody(stage) {
       });
     });
   } else if (stage === 3) {
-    // 🐞 Movie 3: "The Ballad of Lucy Gray" (Balada de Pájaros Cantores) - Covey Folk guitar
+    // 🐞 Melodía 3: "Sonrisa de Primavera" - Folk guitar acoustic arpeggios
     const folkChords = [
       [196.00, 246.94, 392.00, 587.33], // G
       [261.63, 329.63, 392.00, 523.25], // C
@@ -371,7 +371,7 @@ function playStageMelody(stage) {
       });
     });
   } else {
-    // 🏹 Movie 4: "The Hanging Tree" (Sinsajo) - "Are you, are you, coming to the tree..."
+    // ✨ Melodía 4: "El Florecer de la Esperanza" - Romantic melodic theme
     const hangingTree = [
       { f: 329.63, t: 0.0, d: 0.45, v: 0.06 }, // E4
       { f: 392.00, t: 0.5, d: 0.45, v: 0.06 }, // G4
