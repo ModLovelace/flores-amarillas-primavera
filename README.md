@@ -30,8 +30,9 @@ Una experiencia web interactiva, estética y romántica creada para celebrar el 
   - *El Florecer de la Esperanza* con armonías triunfales de alegría y luz.
   - Reproductor vinilo retro flotante con cambio de color y sincronización automática al regar/florecer.
 - 🌸 **Lluvia Interactiva de Pétalos**: Pétalos dorados flotando con física suave y respuesta al cursor y al tacto en pantallas móviles.
+- 💌 **Carta Secreta con Sello de Cera**: Sobre interactivo con sello dorado que al abrirse revela la carta romántica personalizada con el mensaje editable del remitente.
 - 🔗 **Personalizador de Enlaces & Compartir por WhatsApp**:
-  - Modal intuitivo para ingresar el nombre de la persona especial (`?to=Nombre`).
+  - Modal intuitivo para ingresar el nombre de la persona especial (`?to=Nombre`), remitente y mensaje de la carta.
   - Genera automáticamente el mensaje y enlace para enviar por WhatsApp o copiar al portapapeles.
 - 📱 **Diseño 100% Responsivo**: Optimizado para dispositivos móviles y escritorio con animaciones botánicas orgánicas y fluidas.
 
@@ -56,8 +57,8 @@ npm run build
 
 | Rama | Descripción | Despliegue en Vercel |
 |---|---|---|
-| `main` | Versión pública estándar con generador de enlaces para que cualquiera pueda regalar flores amarillas personalizadas | [regala-flores-amarillas.vercel.app](https://regala-flores-amarillas.vercel.app) |
-| `personal` | Edición romántica exclusiva con temática dedicada, Polaroids 3D con poema y carta con sello de cera | [cristtel-con-amor-flores-amarillas.vercel.app](https://cristtel-con-amor-flores-amarillas.vercel.app) |
+| `main` | Versión pública estándar con ramo interactivo, carta secreta con sello de cera y personalizador de enlaces | [regala-flores-amarillas.vercel.app](https://regala-flores-amarillas.vercel.app) |
+| `personal` | Edición romántica exclusiva con temática dedicada a Cristtel, Polaroids 3D con poema y carta con sello de cera | [cristtel-con-amor-flores-amarillas.vercel.app](https://cristtel-con-amor-flores-amarillas.vercel.app) |
 
 ---
 

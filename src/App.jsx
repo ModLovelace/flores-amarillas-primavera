@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PetalsCanvas from './components/PetalsCanvas';
 import Hero from './components/Hero';
 import InteractiveBouquet from './components/InteractiveBouquet';
+import EnvelopeLetter from './components/EnvelopeLetter';
 import MusicPlayer from './components/MusicPlayer';
 import ShareModal from './components/ShareModal';
 import { getInitialDedication } from './utils/urlParams';
@@ -62,6 +63,16 @@ export default function App() {
             recipientName={dedication.to}
             bloomStage={bloomStage}
             onStageChange={setBloomStage}
+          />
+        </section>
+
+        {/* Section 3: Wax Sealed Envelope with Letter */}
+        <section id="carta" className="scroll-mt-16">
+          <EnvelopeLetter
+            recipientName={dedication.to}
+            senderName={dedication.from}
+            message={dedication.message}
+            date={dedication.date}
           />
         </section>
       </main>

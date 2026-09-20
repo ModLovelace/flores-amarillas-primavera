@@ -52,12 +52,20 @@ export default function Hero({ recipientName, onOpenPersonalizer }) {
         </button>
 
         <button
-          onClick={onOpenPersonalizer}
+          onClick={() => scrollToSection('carta')}
           className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white hover:bg-amber-50 text-stone-800 border border-amber-300 font-sans font-medium text-sm sm:text-base shadow-sm hover:shadow hover:scale-105 active:scale-95 transition-all duration-200"
+        >
+          <Mail className="w-4 h-4 text-amber-700" />
+          <span>Abrir Carta Secreta</span>
+        </button>
+
+        <button
+          onClick={onOpenPersonalizer}
+          className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-amber-100/90 hover:bg-amber-200/90 text-amber-950 border border-amber-300 font-sans font-medium text-sm sm:text-base shadow-sm hover:shadow hover:scale-105 active:scale-95 transition-all duration-200"
           title="Personalizar nombres y mensaje para regalar"
         >
-          <Sparkles className="w-4 h-4 text-amber-600" />
-          <span>Personalizar & Regalar</span>
+          <Sparkles className="w-4 h-4 text-amber-700" />
+          <span>Personalizar</span>
         </button>
       </div>
     </header>
