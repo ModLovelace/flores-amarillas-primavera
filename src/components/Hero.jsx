@@ -2,7 +2,8 @@ import React from 'react';
 import { Heart, Sparkles, Mail, ArrowDown, Edit3 } from 'lucide-react';
 import InstagramIcon from './InstagramIcon';
 
-export default function Hero({ recipientName, onOpenPersonalizer, onOpenInstagram }) {
+export default function Hero({ recipientName, onOpenPersonalizer, onOpenBrag, onOpenInstagram }) {
+  const handleOpenBrag = onOpenBrag || onOpenInstagram;
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
     if (el) {
@@ -53,12 +54,12 @@ export default function Hero({ recipientName, onOpenPersonalizer, onOpenInstagra
         </button>
 
         <button
-          onClick={onOpenInstagram}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-purple-600 hover:from-amber-600 hover:via-pink-600 hover:to-purple-700 text-white font-sans font-semibold text-sm sm:text-base shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
-          title="Presumir este ramo en tu historia de Instagram"
+          onClick={handleOpenBrag}
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-rose-600 hover:from-amber-600 hover:via-pink-600 hover:to-rose-700 text-white font-sans font-semibold text-sm sm:text-base shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
+          title="Presumir este ramo en TikTok e Instagram"
         >
-          <InstagramIcon className="w-4 h-4" />
-          <span>Presumir en Instagram</span>
+          <Sparkles className="w-4 h-4 text-yellow-200" />
+          <span>Presumir</span>
         </button>
 
         <button

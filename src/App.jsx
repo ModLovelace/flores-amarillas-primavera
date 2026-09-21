@@ -5,15 +5,14 @@ import InteractiveBouquet from './components/InteractiveBouquet';
 import EnvelopeLetter from './components/EnvelopeLetter';
 import MusicPlayer from './components/MusicPlayer';
 import ShareModal from './components/ShareModal';
-import InstagramStoryModal from './components/InstagramStoryModal';
-import InstagramIcon from './components/InstagramIcon';
+import BragModal from './components/BragModal';
 import { getInitialDedication } from './utils/urlParams';
 import { Heart, Sparkles, Share2 } from 'lucide-react';
 
 export default function App() {
   const [dedication, setDedication] = useState(getInitialDedication);
   const [isPersonalizerOpen, setIsPersonalizerOpen] = useState(false);
-  const [isInstagramModalOpen, setIsInstagramModalOpen] = useState(false);
+  const [isBragModalOpen, setIsBragModalOpen] = useState(false);
   const [bloomStage, setBloomStage] = useState(1);
 
   // Sync title with recipient
@@ -41,13 +40,12 @@ export default function App() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <button
-              onClick={() => setIsInstagramModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-purple-600 text-white text-xs sm:text-sm font-semibold transition-all shadow-sm hover:scale-105 active:scale-95"
-              title="Presumir en Historia de Instagram"
+              onClick={() => setIsBragModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-rose-600 text-white text-xs sm:text-sm font-semibold transition-all shadow-sm hover:scale-105 active:scale-95"
+              title="Presumir tu ramo en TikTok e Instagram"
             >
-              <InstagramIcon className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Presumir en</span>
-              <span>Instagram</span>
+              <Sparkles className="w-3.5 h-3.5 text-yellow-200" />
+              <span>Presumir</span>
             </button>
 
             <button
@@ -69,7 +67,7 @@ export default function App() {
         <Hero
           recipientName={dedication.to}
           onOpenPersonalizer={() => setIsPersonalizerOpen(true)}
-          onOpenInstagram={() => setIsInstagramModalOpen(true)}
+          onOpenBrag={() => setIsBragModalOpen(true)}
         />
 
         {/* Section 2: Interactive Bouquet (Edición Flores Amarillas & Día de la Primavera) */}
@@ -78,7 +76,7 @@ export default function App() {
             recipientName={dedication.to}
             bloomStage={bloomStage}
             onStageChange={setBloomStage}
-            onOpenInstagram={() => setIsInstagramModalOpen(true)}
+            onOpenBrag={() => setIsBragModalOpen(true)}
           />
         </section>
 
@@ -123,10 +121,10 @@ export default function App() {
         onUpdateDedication={setDedication}
       />
 
-      {/* Modal for Instagram Story Viral Brag Card */}
-      <InstagramStoryModal
-        isOpen={isInstagramModalOpen}
-        onClose={() => setIsInstagramModalOpen(false)}
+      {/* Modal for Boasting Flowers on TikTok & Instagram */}
+      <BragModal
+        isOpen={isBragModalOpen}
+        onClose={() => setIsBragModalOpen(false)}
         recipientName={dedication.to}
         senderName={dedication.from}
       />

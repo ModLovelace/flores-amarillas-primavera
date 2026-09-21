@@ -8,8 +8,10 @@ export default function InteractiveBouquet({
   recipientName,
   bloomStage: externalBloomStage,
   onStageChange,
+  onOpenBrag,
   onOpenInstagram,
 }) {
+  const handleOpenBrag = onOpenBrag || onOpenInstagram;
   const [internalBloomStage, setInternalBloomStage] = useState(1);
   const bloomStage = externalBloomStage !== undefined ? externalBloomStage : internalBloomStage;
   const setBloomStage = (val) => {
@@ -803,15 +805,15 @@ export default function InteractiveBouquet({
           )}
         </p>
 
-        {/* Presumir en Instagram CTA */}
-        {onOpenInstagram && (
+        {/* Presumir CTA */}
+        {handleOpenBrag && (
           <button
-            onClick={onOpenInstagram}
-            className="mt-1 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-pink-50 text-stone-800 border border-pink-200 text-xs sm:text-sm font-sans font-semibold shadow-xs hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-200"
-            title="Presumir este ramo en tus historias de Instagram"
+            onClick={handleOpenBrag}
+            className="mt-1 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-amber-50 text-stone-800 border border-amber-300 text-xs sm:text-sm font-sans font-semibold shadow-xs hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-200"
+            title="Presumir este ramo en TikTok e Instagram"
           >
-            <InstagramIcon className="w-4 h-4 text-pink-600" />
-            <span>📸 Presumir este ramo en Instagram</span>
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            <span>✨ Presumir este ramo</span>
           </button>
         )}
       </div>
