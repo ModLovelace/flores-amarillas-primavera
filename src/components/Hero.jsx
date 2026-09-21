@@ -1,7 +1,8 @@
 import React from 'react';
 import { Heart, Sparkles, Mail, ArrowDown, Edit3 } from 'lucide-react';
+import InstagramIcon from './InstagramIcon';
 
-export default function Hero({ recipientName, onOpenPersonalizer }) {
+export default function Hero({ recipientName, onOpenPersonalizer, onOpenInstagram }) {
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
     if (el) {
@@ -42,29 +43,38 @@ export default function Hero({ recipientName, onOpenPersonalizer }) {
       </p>
 
       {/* CTA Buttons */}
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5 sm:gap-4">
         <button
           onClick={() => scrollToSection('ramo')}
-          className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-sunflower-400 hover:bg-sunflower-500 text-stone-900 font-sans font-semibold text-sm sm:text-base shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-sunflower-400 hover:bg-sunflower-500 text-stone-900 font-sans font-semibold text-sm sm:text-base shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
         >
           <span>🌻 Ver mi Ramo Floral</span>
           <ArrowDown className="w-4 h-4 text-stone-900" />
         </button>
 
         <button
+          onClick={onOpenInstagram}
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-purple-600 hover:from-amber-600 hover:via-pink-600 hover:to-purple-700 text-white font-sans font-semibold text-sm sm:text-base shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
+          title="Presumir este ramo en tu historia de Instagram"
+        >
+          <InstagramIcon className="w-4 h-4" />
+          <span>Presumir en Instagram</span>
+        </button>
+
+        <button
           onClick={() => scrollToSection('carta')}
-          className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white hover:bg-amber-50 text-stone-800 border border-amber-300 font-sans font-medium text-sm sm:text-base shadow-sm hover:shadow hover:scale-105 active:scale-95 transition-all duration-200"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-amber-50 text-stone-800 border border-amber-300 font-sans font-medium text-sm sm:text-base shadow-sm hover:shadow hover:scale-105 active:scale-95 transition-all duration-200"
         >
           <Mail className="w-4 h-4 text-amber-700" />
-          <span>Abrir Carta Secreta</span>
+          <span>Carta Secreta</span>
         </button>
 
         <button
           onClick={onOpenPersonalizer}
-          className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-amber-100/90 hover:bg-amber-200/90 text-amber-950 border border-amber-300 font-sans font-medium text-sm sm:text-base shadow-sm hover:shadow hover:scale-105 active:scale-95 transition-all duration-200"
+          className="inline-flex items-center gap-1.5 px-5 py-3 rounded-full bg-amber-100/90 hover:bg-amber-200/90 text-amber-950 border border-amber-300 font-sans font-medium text-xs sm:text-sm shadow-sm hover:shadow hover:scale-105 active:scale-95 transition-all duration-200"
           title="Personalizar nombres y mensaje para regalar"
         >
-          <Sparkles className="w-4 h-4 text-amber-700" />
+          <Sparkles className="w-3.5 h-3.5 text-amber-700" />
           <span>Personalizar</span>
         </button>
       </div>

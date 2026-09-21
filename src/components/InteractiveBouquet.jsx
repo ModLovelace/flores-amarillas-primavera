@@ -2,11 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Sparkles, Heart, Droplets, Sun, Feather, Star, Flame, Wind } from 'lucide-react';
 import { startMovieMusic } from '../utils/audioChimes';
+import InstagramIcon from './InstagramIcon';
 
 export default function InteractiveBouquet({
   recipientName,
   bloomStage: externalBloomStage,
   onStageChange,
+  onOpenInstagram,
 }) {
   const [internalBloomStage, setInternalBloomStage] = useState(1);
   const bloomStage = externalBloomStage !== undefined ? externalBloomStage : internalBloomStage;
@@ -800,6 +802,18 @@ export default function InteractiveBouquet({
             </span>
           )}
         </p>
+
+        {/* Presumir en Instagram CTA */}
+        {onOpenInstagram && (
+          <button
+            onClick={onOpenInstagram}
+            className="mt-1 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-pink-50 text-stone-800 border border-pink-200 text-xs sm:text-sm font-sans font-semibold shadow-xs hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-200"
+            title="Presumir este ramo en tus historias de Instagram"
+          >
+            <InstagramIcon className="w-4 h-4 text-pink-600" />
+            <span>📸 Presumir este ramo en Instagram</span>
+          </button>
+        )}
       </div>
     </div>
   );

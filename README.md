@@ -31,6 +31,7 @@ Una experiencia web interactiva, estética y romántica creada para celebrar el 
   - Reproductor vinilo retro flotante con cambio de color y sincronización automática al regar/florecer.
 - 🌸 **Lluvia Interactiva de Pétalos**: Pétalos dorados flotando con física suave y respuesta al cursor y al tacto en pantallas móviles.
 - 💌 **Carta Secreta con Sello de Cera**: Sobre interactivo con sello dorado que al abrirse revela la carta romántica personalizada con el mensaje editable del remitente.
+- 📸 **Presumir en Instagram Stories (HD 9:16)**: Generador instantáneo de postales en alta resolución para historias de Instagram con integración nativa de Web Share API en celulares y descarga / copiado al portapapeles en computadora.
 - 🔗 **Personalizador de Enlaces & Compartir por WhatsApp**:
   - Modal intuitivo para ingresar el nombre de la persona especial (`?to=Nombre`), remitente y mensaje de la carta.
   - Genera automáticamente el mensaje y enlace para enviar por WhatsApp o copiar al portapapeles.

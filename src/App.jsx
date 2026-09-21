@@ -5,12 +5,15 @@ import InteractiveBouquet from './components/InteractiveBouquet';
 import EnvelopeLetter from './components/EnvelopeLetter';
 import MusicPlayer from './components/MusicPlayer';
 import ShareModal from './components/ShareModal';
+import InstagramStoryModal from './components/InstagramStoryModal';
+import InstagramIcon from './components/InstagramIcon';
 import { getInitialDedication } from './utils/urlParams';
 import { Heart, Sparkles, Share2 } from 'lucide-react';
 
 export default function App() {
   const [dedication, setDedication] = useState(getInitialDedication);
   const [isPersonalizerOpen, setIsPersonalizerOpen] = useState(false);
+  const [isInstagramModalOpen, setIsInstagramModalOpen] = useState(false);
   const [bloomStage, setBloomStage] = useState(1);
 
   // Sync title with recipient
@@ -38,12 +41,23 @@ export default function App() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <button
+              onClick={() => setIsInstagramModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-purple-600 text-white text-xs sm:text-sm font-semibold transition-all shadow-sm hover:scale-105 active:scale-95"
+              title="Presumir en Historia de Instagram"
+            >
+              <InstagramIcon className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Presumir en</span>
+              <span>Instagram</span>
+            </button>
+
+            <button
               onClick={() => setIsPersonalizerOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-sunflower-300 hover:bg-sunflower-400 text-sunflower-950 text-xs sm:text-sm font-semibold transition-all shadow-sm hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-sunflower-300 hover:bg-sunflower-400 text-sunflower-950 text-xs sm:text-sm font-semibold transition-all shadow-sm hover:scale-105 active:scale-95"
               title="Personalizar nombres y dedicatoria"
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span>Personalizar & Enviar</span>
+              <span className="hidden sm:inline">Personalizar &</span>
+              <span>Enviar</span>
             </button>
           </div>
         </div>
@@ -55,6 +69,7 @@ export default function App() {
         <Hero
           recipientName={dedication.to}
           onOpenPersonalizer={() => setIsPersonalizerOpen(true)}
+          onOpenInstagram={() => setIsInstagramModalOpen(true)}
         />
 
         {/* Section 2: Interactive Bouquet (Edición Flores Amarillas & Día de la Primavera) */}
@@ -63,6 +78,7 @@ export default function App() {
             recipientName={dedication.to}
             bloomStage={bloomStage}
             onStageChange={setBloomStage}
+            onOpenInstagram={() => setIsInstagramModalOpen(true)}
           />
         </section>
 
@@ -105,6 +121,14 @@ export default function App() {
         onClose={() => setIsPersonalizerOpen(false)}
         dedication={dedication}
         onUpdateDedication={setDedication}
+      />
+
+      {/* Modal for Instagram Story Viral Brag Card */}
+      <InstagramStoryModal
+        isOpen={isInstagramModalOpen}
+        onClose={() => setIsInstagramModalOpen(false)}
+        recipientName={dedication.to}
+        senderName={dedication.from}
       />
     </div>
   );
