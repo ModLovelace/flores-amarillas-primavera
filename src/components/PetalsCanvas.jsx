@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
+import { getTheme } from '../config/themes';
 
-export default function PetalsCanvas() {
+export default function PetalsCanvas({ themeId = 'flores-amarillas' }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -53,17 +54,11 @@ export default function PetalsCanvas() {
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
 
-    // Petal colors: warm buttery yellows, sunflower golden yellow, soft amber
-    const colors = [
-      '#FDE047', // bright yellow
-      '#FACC15', // warm yellow
-      '#FEF08A', // soft pastel butter
-      '#EAB308', // sunflower gold
-      '#FFFBEB', // warm daisy petal
-      '#FBBF24'  // amber gold
-    ];
+    const currentTheme = getTheme(themeId);
+    const colors = currentTheme.palette.particleColors;
+    const particleType = currentTheme.palette.particleType;
 
-    class Petal {
+    class Particle {
       constructor() {
         this.reset(true);
       }
@@ -71,18 +66,19 @@ export default function PetalsCanvas() {
       reset(initial = false) {
         this.x = Math.random() * width;
         this.y = initial ? Math.random() * height : -30;
-        this.size = Math.random() * 10 + 9; // 9 to 19px
-        this.speedX = (Math.random() - 0.5) * 1.2 + 0.3; // gentle breeze to the right
-        this.speedY = Math.random() * 1.5 + 0.8;
+        this.size = Math.random() * 8 + 8; // 8 to 16px
+        this.speedX = (Math.random() - 0.5) * 1.2 + 0.2;
+        this.speedY = Math.random() * 1.4 + 0.7;
         this.angle = Math.random() * Math.PI * 2;
-        this.angularSpeed = (Math.random() - 0.5) * 0.03;
+        this.angularSpeed = (Math.random() - 0.5) * 0.04;
         this.oscillationSpeed = Math.random() * 0.02 + 0.01;
-        this.oscillationDistance = Math.random() * 40 + 20;
+        this.oscillationDistance = Math.random() * 35 + 15;
         this.oscillationBaseX = this.x;
         this.oscillationTimer = Math.random() * 100;
         this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.opacity = Math.random() * 0.45 + 0.45; // 0.45 - 0.9
-        this.aspectRatio = Math.random() * 0.5 + 0.35; // elongated petal shape
+        this.opacity = Math.random() * 0.45 + 0.45;
+        this.aspectRatio = Math.random() * 0.5 + 0.35;
+        this.shapeVariant = Math.floor(Math.random() * 2); // for hearts/petals or confetti
       }
 
       update() {
@@ -117,54 +113,96 @@ export default function PetalsCanvas() {
         ctx.globalAlpha = this.opacity;
         ctx.fillStyle = this.color;
 
-        // Draw curved organic petal
-        ctx.beginPath();
-        const rx = this.size;
-        const ry = this.size * this.aspectRatio;
-        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-        ctx.fill();
+        if (particleType === 'confetti') {
+          // Festive confetti ribbons and rectangles
+          const w = this.size;
+          const h = this.size * 0.5;
+          if (this.shapeVariant === 0) {
+            ctx.fillRect(-w / 2, -h / 2, w, h);
+          } else {
+            ctx.beginPath();
+            ctx.arc(0, 0, this.size * 0.35, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else if (particleType === 'sparkles') {
+          // 4-point golden star sparkle
+          const r = this.size * 0.7;
+          ctx.beginPath();
+          ctx.moveTo(0, -r);
+          ctx.quadraticCurveTo(0, 0, r, 0);
+          ctx.quadraticCurveTo(0, 0, 0, r);
+          ctx.quadraticCurveTo(0, 0, -r, 0);
+          ctx.quadraticCurveTo(0, 0, 0, -r);
+          ctx.fill();
 
-        // Delicate inner vein highlight
-        ctx.beginPath();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
-        ctx.lineWidth = 1;
-        ctx.moveTo(-rx * 0.5, 0);
-        ctx.lineTo(rx * 0.5, 0);
-        ctx.stroke();
+          ctx.beginPath();
+          ctx.fillStyle = '#FFFFFF';
+          ctx.arc(0, 0, r * 0.25, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (particleType === 'hearts') {
+          // Floating sweet hearts or rose petals
+          if (this.shapeVariant === 0) {
+            const s = this.size * 0.6;
+            ctx.beginPath();
+            ctx.moveTo(0, s * 0.3);
+            ctx.bezierCurveTo(-s, -s * 0.6, -s * 1.2, s * 0.6, 0, s * 1.3);
+            ctx.bezierCurveTo(s * 1.2, s * 0.6, s, -s * 0.6, 0, s * 0.3);
+            ctx.fill();
+          } else {
+            // Rose petal
+            const rx = this.size;
+            const ry = this.size * this.aspectRatio;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          // Default: Sunflower / Daisy petals
+          const rx = this.size;
+          const ry = this.size * this.aspectRatio;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+          ctx.lineWidth = 1;
+          ctx.moveTo(-rx * 0.5, 0);
+          ctx.lineTo(rx * 0.5, 0);
+          ctx.stroke();
+        }
 
         ctx.restore();
       }
     }
 
-    // Number of floating petals adapted to screen width
-    const petalCount = width < 768 ? 24 : 45;
-    const petals = Array.from({ length: petalCount }, () => new Petal());
+    const particleCount = width < 768 ? 24 : 45;
+    const particles = Array.from({ length: particleCount }, () => new Particle());
 
-    const render = () => {
+    const animate = () => {
       ctx.clearRect(0, 0, width, height);
-      for (let i = 0; i < petals.length; i++) {
-        petals[i].update();
-        petals[i].draw();
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
       }
-      animationFrameId = requestAnimationFrame(render);
+      animationFrameId = requestAnimationFrame(animate);
     };
 
-    render();
+    animate();
 
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
-      clearTimeout(mouseTimeout);
     };
-  }, []);
+  }, [themeId]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-20 w-full h-full"
-      aria-hidden="true"
+      className="fixed inset-0 pointer-events-none z-0"
+      style={{ willChange: 'transform' }}
     />
   );
 }

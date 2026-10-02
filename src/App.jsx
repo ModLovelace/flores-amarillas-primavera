@@ -6,43 +6,81 @@ import EnvelopeLetter from './components/EnvelopeLetter';
 import MusicPlayer from './components/MusicPlayer';
 import ShareModal from './components/ShareModal';
 import BragModal from './components/BragModal';
-import { getInitialDedication } from './utils/urlParams';
-import { Heart, Sparkles, Share2 } from 'lucide-react';
+import { ThemeModal } from './components/ThemeSelector';
+import { getTheme } from './config/themes';
+import { getInitialDedication, saveDedicationToStorage } from './utils/urlParams';
+import { switchMovieStageMusic } from './utils/audioChimes';
+import { Heart, Sparkles, Share2, Palette } from 'lucide-react';
 
 export default function App() {
   const [dedication, setDedication] = useState(getInitialDedication);
   const [isPersonalizerOpen, setIsPersonalizerOpen] = useState(false);
   const [isBragModalOpen, setIsBragModalOpen] = useState(false);
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [bloomStage, setBloomStage] = useState(1);
 
-  // Sync title with recipient
+  const currentTheme = getTheme(dedication.theme);
+
+  // Sync title with recipient and current theme
   useEffect(() => {
-    document.title = `🌻 Flores Amarillas para ${dedication.to} | Día de la Primavera`;
-  }, [dedication.to]);
+    document.title = `${currentTheme.emoji} ${currentTheme.shortName} para ${dedication.to}`;
+  }, [dedication.to, currentTheme]);
+
+  const handleSelectTheme = (newThemeId) => {
+    const newTheme = getTheme(newThemeId);
+    setDedication((prev) => {
+      const isDefaultMsg = prev.message === currentTheme.defaultMessage;
+      const isDefaultDate = prev.date === currentTheme.defaultDate;
+      const updated = {
+        ...prev,
+        theme: newThemeId,
+        message: isDefaultMsg ? newTheme.defaultMessage : prev.message,
+        date: isDefaultDate ? newTheme.defaultDate : prev.date
+      };
+      saveDedicationToStorage(updated);
+      return updated;
+    });
+    // Switch music track to match new theme
+    switchMovieStageMusic(bloomStage, newThemeId);
+  };
+
+  const handleUpdateDedication = (newData) => {
+    setDedication(newData);
+    saveDedicationToStorage(newData);
+    if (newData.theme && newData.theme !== currentTheme.id) {
+      switchMovieStageMusic(bloomStage, newData.theme);
+    }
+  };
 
   return (
-    <div className="relative min-h-screen flex flex-col font-sans selection:bg-sunflower-300 selection:text-stone-900">
-      {/* Interactive Floating Petals Canvas */}
-      <PetalsCanvas />
+    <div className={`relative min-h-screen flex flex-col font-sans transition-colors duration-700 selection:bg-amber-300 selection:text-stone-900 ${currentTheme.palette.bgGradient}`}>
+      {/* Dynamic Floating Particles Canvas */}
+      <PetalsCanvas themeId={currentTheme.id} />
 
       {/* Aesthetic Top Navigation Bar */}
-      <nav className="sticky top-0 z-30 w-full bg-cream-100/80 backdrop-blur-md border-b border-amber-200/50 px-4 sm:px-8 py-3 transition-all">
+      <nav className="sticky top-0 z-30 w-full bg-white/75 backdrop-blur-md border-b border-stone-200/60 px-4 sm:px-8 py-2.5 transition-all">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
+          {/* Logo & Theme Picker Trigger */}
           <div className="flex items-center gap-2">
-            <span className="text-xl animate-bounce">🌻</span>
-            <span className="font-serif font-bold text-lg sm:text-xl text-stone-800 tracking-tight">
-              Flores Amarillas
-            </span>
-            <span className="hidden sm:inline-block font-handwriting text-lg text-amber-700 ml-1">
-              · 21 de Septiembre
-            </span>
+            <button
+              onClick={() => setIsThemeModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-stone-50 border border-stone-200 text-stone-800 text-xs sm:text-sm font-semibold transition-all shadow-2xs hover:scale-105 active:scale-95 group"
+              title="Cambiar ocasión o temática"
+            >
+              <span className="text-base group-hover:scale-110 transition-transform">{currentTheme.emoji}</span>
+              <span className="font-serif font-bold text-stone-900 tracking-tight">
+                {currentTheme.shortName}
+              </span>
+              <Palette className="w-3.5 h-3.5 text-stone-400 group-hover:text-stone-700 ml-0.5" />
+            </button>
           </div>
 
+          {/* Action Header Buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setIsBragModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-rose-600 text-white text-xs sm:text-sm font-semibold transition-all shadow-sm hover:scale-105 active:scale-95"
-              title="Presumir tu ramo en TikTok e Instagram"
+              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-rose-600 text-white text-xs sm:text-sm font-semibold transition-all shadow-xs hover:scale-105 active:scale-95"
+              title="Presumir este momento en TikTok e Instagram"
             >
               <Sparkles className="w-3.5 h-3.5 text-yellow-200" />
               <span>Presumir</span>
@@ -50,7 +88,7 @@ export default function App() {
 
             <button
               onClick={() => setIsPersonalizerOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-sunflower-300 hover:bg-sunflower-400 text-sunflower-950 text-xs sm:text-sm font-semibold transition-all shadow-sm hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 text-xs sm:text-sm font-semibold transition-all shadow-xs hover:scale-105 active:scale-95"
               title="Personalizar nombres y dedicatoria"
             >
               <Share2 className="w-3.5 h-3.5" />
@@ -63,17 +101,21 @@ export default function App() {
 
       {/* Main Content Sections */}
       <main className="flex-1 z-10 space-y-8 sm:space-y-16">
-        {/* Section 1: Hero */}
+        {/* Section 1: Hero with Occasion Pills */}
         <Hero
+          theme={currentTheme}
           recipientName={dedication.to}
           onOpenPersonalizer={() => setIsPersonalizerOpen(true)}
           onOpenBrag={() => setIsBragModalOpen(true)}
+          onOpenThemeModal={() => setIsThemeModalOpen(true)}
+          onSelectTheme={handleSelectTheme}
         />
 
-        {/* Section 2: Interactive Bouquet (Edición Flores Amarillas & Día de la Primavera) */}
+        {/* Section 2: Interactive Centerpiece (Flores / Pastel / Trofeo / Rosas) */}
         <section id="ramo" className="scroll-mt-16">
           <InteractiveBouquet
             recipientName={dedication.to}
+            theme={currentTheme}
             bloomStage={bloomStage}
             onStageChange={setBloomStage}
             onOpenBrag={() => setIsBragModalOpen(true)}
@@ -83,6 +125,7 @@ export default function App() {
         {/* Section 3: Wax Sealed Envelope with Letter */}
         <section id="carta" className="scroll-mt-16">
           <EnvelopeLetter
+            theme={currentTheme}
             recipientName={dedication.to}
             senderName={dedication.from}
             message={dedication.message}
@@ -92,12 +135,12 @@ export default function App() {
       </main>
 
       {/* Aesthetic Footer */}
-      <footer className="relative z-10 mt-16 py-10 border-t border-amber-200/60 bg-cream-200/50 text-center text-stone-600 text-xs sm:text-sm">
+      <footer className="relative z-10 mt-16 py-10 border-t border-stone-200/60 bg-white/40 text-center text-stone-600 text-xs sm:text-sm">
         <div className="max-w-4xl mx-auto px-4 flex flex-col items-center gap-3">
-          <div className="flex items-center gap-2 text-amber-800 font-serif text-base font-semibold">
-            <span>🌻</span>
-            <span>Feliz Día de la Primavera & Flores Amarillas</span>
-            <span>🌻</span>
+          <div className="flex items-center gap-2 text-stone-800 font-serif text-base font-semibold">
+            <span>{currentTheme.emoji}</span>
+            <span>{currentTheme.name}</span>
+            <span>{currentTheme.emoji}</span>
           </div>
           <p className="font-handwriting text-xl text-stone-700 max-w-md">
             "Que cada día de tu vida tenga el color, la luz y la calidez del sol primaveral."
@@ -110,21 +153,30 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Floating Retro Vinyl Audio Player (Sincronizado dinámicamente con las canciones) */}
-      <MusicPlayer bloomStage={bloomStage} />
+      {/* Floating Retro Vinyl Audio Player (Sincronizado dinámicamente) */}
+      <MusicPlayer bloomStage={bloomStage} themeId={currentTheme.id} />
 
-      {/* Modal for Personalizing Names and Link Sharing */}
+      {/* Modal for Selecting Occasion / Theme */}
+      <ThemeModal
+        isOpen={isThemeModalOpen}
+        onClose={() => setIsThemeModalOpen(false)}
+        activeThemeId={currentTheme.id}
+        onSelectTheme={handleSelectTheme}
+      />
+
+      {/* Modal for Personalizing Names, Occasion and Link Sharing */}
       <ShareModal
         isOpen={isPersonalizerOpen}
         onClose={() => setIsPersonalizerOpen(false)}
         dedication={dedication}
-        onUpdateDedication={setDedication}
+        onUpdateDedication={handleUpdateDedication}
       />
 
-      {/* Modal for Boasting Flowers on TikTok & Instagram */}
+      {/* Modal for Boasting on TikTok & Instagram */}
       <BragModal
         isOpen={isBragModalOpen}
         onClose={() => setIsBragModalOpen(false)}
+        themeId={currentTheme.id}
         recipientName={dedication.to}
         senderName={dedication.from}
       />

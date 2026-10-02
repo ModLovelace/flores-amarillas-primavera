@@ -6,6 +6,7 @@ let activeMusicInterval = null;
 let activeMusicTimeouts = [];
 let isMusicPlaying = false;
 let currentActiveStage = 1;
+let currentActiveTheme = 'flores-amarillas';
 const musicListeners = new Set();
 
 function getAudioContext() {
@@ -35,38 +36,29 @@ function getMusicMasterGain(ctx) {
  * Guaranteed zero overlap.
  */
 export function stopAllMusicAudio() {
-  // 1. Clear any recurring loop interval
   if (activeMusicInterval) {
     clearInterval(activeMusicInterval);
     activeMusicInterval = null;
   }
 
-  // 2. Clear any pending timeouts
   activeMusicTimeouts.forEach((t) => clearTimeout(t));
   activeMusicTimeouts = [];
 
-  // 3. Immediately stop and disconnect all scheduled oscillators
   activeMusicOscillators.forEach((osc) => {
     try {
       osc.stop(0);
       osc.disconnect();
-    } catch (e) {
-      // already stopped/disconnected
-    }
+    } catch (e) {}
   });
   activeMusicOscillators = [];
 
-  // 4. Instantly cut off music master gain node so no lingering reverb or note tails bleed through
   if (audioCtx && musicMasterGain) {
     try {
       const now = audioCtx.currentTime;
       musicMasterGain.gain.cancelScheduledValues(now);
       musicMasterGain.gain.setValueAtTime(0, now);
-      // Quickly restore gain for the new track
       musicMasterGain.gain.setValueAtTime(1.0, now + 0.02);
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
   }
 }
 
@@ -110,49 +102,6 @@ function playAcousticNote(ctx, freq, time, duration = 0.8, volume = 0.05, type =
     };
   } catch (err) {
     console.warn('Note play error:', err);
-  }
-}
-
-/**
- * Play cheerful 4-note Spring Songbird whistle
- */
-export function playRueWhistleAndBloom(stage = 1) {
-  try {
-    const ctx = getAudioContext();
-    if (!ctx) return;
-
-    const now = ctx.currentTime;
-    const whistleNotes = [
-      { freq: 392.00, time: 0.00, dur: 0.28 },
-      { freq: 466.16, time: 0.26, dur: 0.30 },
-      { freq: 440.00, time: 0.54, dur: 0.32 },
-      { freq: 293.66, time: 0.84, dur: 0.55 },
-    ];
-
-    whistleNotes.forEach(({ freq, time, dur }) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + time);
-
-      gain.gain.setValueAtTime(0, now + time);
-      gain.gain.linearRampToValueAtTime(0.14, now + time + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + time + dur);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(now + time);
-      osc.stop(now + time + dur);
-    });
-
-    const t = setTimeout(() => {
-      playBloomSound(stage);
-    }, 850);
-    activeMusicTimeouts.push(t);
-  } catch (err) {
-    console.warn('Rue whistle error:', err);
   }
 }
 
@@ -259,46 +208,46 @@ export function playFlipSound() {
 }
 
 /**
- * =========================================================================
- * MULTI-TRACK MOVIE SOUNDTRACK ENGINE (100% LIBRE DE PROBLEMAS DE AUTOR)
- * Síntesis acústica artesanal con Web Audio API de los temas icónicos de cada película.
- * =========================================================================
+ * Track info helper
  */
+export function getTrackInfo(stage = 1, theme = 'flores-amarillas') {
+  if (theme === 'cumpleanos') {
+    return {
+      movie: 'Cumpleaños Feliz',
+      title: 'Sweet Birthday Melody',
+      subtitle: 'Campanas y celesta dulce',
+      vinylColor: '#F472B6',
+      tag: '🎂 Velas & Deseos'
+    };
+  }
+  if (theme === 'logro-profesional') {
+    return {
+      movie: 'Logro & Éxito',
+      title: 'Fanfarria del Triunfo',
+      subtitle: 'Himno de orgullo y victoria',
+      vinylColor: '#10B981',
+      tag: '🎓 Laureles de Victoria'
+    };
+  }
+  if (theme === 'aniversario') {
+    return {
+      movie: 'Aniversario de Amor',
+      title: 'Balada de Eterna Complicidad',
+      subtitle: 'Acordes cálidos y cuerdas románticas',
+      vinylColor: '#F43F5E',
+      tag: '💖 Amor Incondicional'
+    };
+  }
 
-export const MOVIE_TRACKS = [
-  {
-    stage: 1,
-    movie: 'Primavera en Flor',
-    title: 'Flores Amarillas (Vals de Primavera)',
-    subtitle: 'Campanas y celesta suave',
-    vinylColor: '#FACC15',
-    tag: '🌼 Dientes de León & Sol'
-  },
-  {
-    stage: 2,
-    movie: 'Luz de Septiembre',
-    title: 'Arpegio de los Girasoles',
-    subtitle: 'Arpa y acordes cálidos de amor',
-    vinylColor: '#F97316',
-    tag: '🌻 Girasoles & Rosas'
-  },
-  {
-    stage: 3,
-    movie: 'Jardín Silvestre',
-    title: 'Sonrisa de Primavera',
-    subtitle: 'Guitarra acústica y brisa cálida',
-    vinylColor: '#84CC16',
-    tag: '🌿 Follaje & Margaritas'
-  },
-  {
-    stage: 4,
-    movie: 'Eterna Primavera',
-    title: 'El Florecer de la Esperanza',
-    subtitle: 'Melodía triunfal de luz y alegría',
-    vinylColor: '#EAB308',
-    tag: '✨ Primavera Dorada'
-  },
-];
+  // Default: Flores Amarillas
+  const tracks = [
+    { movie: 'Primavera en Flor', title: 'Flores Amarillas (Vals de Primavera)', subtitle: 'Campanas y celesta suave', vinylColor: '#FACC15', tag: '🌼 Dientes de León & Sol' },
+    { movie: 'Luz de Septiembre', title: 'Arpegio de los Girasoles', subtitle: 'Arpa y acordes cálidos de amor', vinylColor: '#F97316', tag: '🌻 Girasoles & Rosas' },
+    { movie: 'Jardín Silvestre', title: 'Sonrisa de Primavera', subtitle: 'Guitarra acústica y brisa cálida', vinylColor: '#84CC16', tag: '🌿 Follaje & Margaritas' },
+    { movie: 'Eterna Primavera', title: 'El Florecer de la Esperanza', subtitle: 'Melodía triunfal de luz y alegría', vinylColor: '#EAB308', tag: '✨ Primavera Dorada' }
+  ];
+  return tracks[stage - 1] || tracks[0];
+}
 
 export function isAudioCurrentlyPlaying() {
   return isMusicPlaying;
@@ -308,111 +257,163 @@ export function getCurrentStageTrack() {
   return currentActiveStage;
 }
 
+export function getCurrentMusicTheme() {
+  return currentActiveTheme;
+}
+
 export function subscribeMusicState(fn) {
   musicListeners.add(fn);
-  fn(isMusicPlaying, currentActiveStage);
+  fn(isMusicPlaying, currentActiveStage, currentActiveTheme);
   return () => musicListeners.delete(fn);
 }
 
 function notifyMusicListeners() {
-  musicListeners.forEach((fn) => fn(isMusicPlaying, currentActiveStage));
+  musicListeners.forEach((fn) => fn(isMusicPlaying, currentActiveStage, currentActiveTheme));
 }
 
 /**
- * Render one iteration of the selected movie's melody
+ * Render one iteration of the selected melody according to theme & stage
  */
-function playStageMelody(stage) {
+function playStageMelody(stage, theme = 'flores-amarillas') {
   if (!isMusicPlaying) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
   const now = ctx.currentTime;
 
+  // 1. CUMPLEAÑOS
+  if (theme === 'cumpleanos') {
+    // Happy Birthday in G Major / D
+    const birthdayNotes = [
+      { f: 293.66, t: 0.0, d: 0.45, v: 0.06 }, // D4
+      { f: 293.66, t: 0.5, d: 0.35, v: 0.06 }, // D4
+      { f: 329.63, t: 0.9, d: 0.70, v: 0.07 }, // E4
+      { f: 293.66, t: 1.7, d: 0.70, v: 0.07 }, // D4
+      { f: 392.00, t: 2.5, d: 0.80, v: 0.08 }, // G4
+      { f: 369.99, t: 3.4, d: 1.30, v: 0.07 }, // F#4
+      // Second phrase
+      { f: 293.66, t: 4.8, d: 0.45, v: 0.06 }, // D4
+      { f: 293.66, t: 5.3, d: 0.35, v: 0.06 }, // D4
+      { f: 329.63, t: 5.7, d: 0.70, v: 0.07 }, // E4
+      { f: 293.66, t: 6.5, d: 0.70, v: 0.07 }, // D4
+      { f: 440.00, t: 7.3, d: 0.80, v: 0.08 }, // A4
+      { f: 392.00, t: 8.2, d: 1.50, v: 0.08 }  // G4
+    ];
+    playAcousticNote(ctx, 196.00, now, 8.5, 0.03, 'triangle'); // Bass G
+    birthdayNotes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
+    return;
+  }
+
+  // 2. LOGRO PROFESIONAL
+  if (theme === 'logro-profesional') {
+    // Triumphant, inspiring ascending melody (Victory & Pride)
+    const successNotes = [
+      { f: 261.63, t: 0.0, d: 0.8, v: 0.06 }, // C4
+      { f: 329.63, t: 0.7, d: 0.8, v: 0.06 }, // E4
+      { f: 392.00, t: 1.4, d: 0.9, v: 0.07 }, // G4
+      { f: 523.25, t: 2.2, d: 1.2, v: 0.08 }, // C5
+      { f: 493.88, t: 3.4, d: 0.6, v: 0.06 }, // B4
+      { f: 523.25, t: 4.1, d: 0.6, v: 0.07 }, // C5
+      { f: 587.33, t: 4.8, d: 0.7, v: 0.07 }, // D5
+      { f: 659.25, t: 5.6, d: 1.6, v: 0.09 }  // E5
+    ];
+    playAcousticNote(ctx, 130.81, now, 6.5, 0.04, 'triangle'); // Bass C
+    successNotes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
+    return;
+  }
+
+  // 3. ANIVERSARIO & AMOR
+  if (theme === 'aniversario') {
+    // Romantic warm love chords and gentle acoustic melody
+    const loveNotes = [
+      { f: 329.63, t: 0.0, d: 0.9, v: 0.06 }, // E4
+      { f: 392.00, t: 0.7, d: 0.8, v: 0.06 }, // G4
+      { f: 440.00, t: 1.4, d: 1.0, v: 0.07 }, // A4
+      { f: 392.00, t: 2.3, d: 0.8, v: 0.06 }, // G4
+      { f: 329.63, t: 3.0, d: 0.9, v: 0.06 }, // E4
+      { f: 293.66, t: 3.8, d: 0.8, v: 0.05 }, // D4
+      { f: 261.63, t: 4.5, d: 1.8, v: 0.07 }  // C4
+    ];
+    playAcousticNote(ctx, 130.81, now, 6.0, 0.035, 'sine'); // Soft warm base
+    loveNotes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
+    return;
+  }
+
+  // 4. FLORES AMARILLAS & PRIMAVERA (Original Vals)
   if (stage === 1) {
-    // 🌼 Melodía 1: "Flores Amarillas (Vals de Primavera)" - Gentle celesta & harp
     const notes = [
-      { f: 293.66, t: 0.0, d: 0.9, v: 0.055 }, // D4
-      { f: 369.99, t: 0.6, d: 0.8, v: 0.055 }, // F#4
-      { f: 440.00, t: 1.2, d: 1.1, v: 0.065 }, // A4
-      { f: 493.88, t: 1.8, d: 0.8, v: 0.055 }, // B4
-      { f: 440.00, t: 2.3, d: 1.0, v: 0.060 }, // A4
-      { f: 369.99, t: 3.0, d: 0.9, v: 0.050 }, // F#4
-      { f: 329.63, t: 3.6, d: 0.8, v: 0.050 }, // E4
-      { f: 293.66, t: 4.2, d: 1.4, v: 0.065 }, // D4
+      { f: 293.66, t: 0.0, d: 0.9, v: 0.055 },
+      { f: 369.99, t: 0.6, d: 0.8, v: 0.055 },
+      { f: 440.00, t: 1.2, d: 1.1, v: 0.065 },
+      { f: 493.88, t: 1.8, d: 0.8, v: 0.055 },
+      { f: 440.00, t: 2.3, d: 1.0, v: 0.060 },
+      { f: 369.99, t: 3.0, d: 0.9, v: 0.050 },
+      { f: 329.63, t: 3.6, d: 0.8, v: 0.050 },
+      { f: 293.66, t: 4.2, d: 1.4, v: 0.065 },
     ];
     playAcousticNote(ctx, 146.83, now, 4.5, 0.03, 'triangle');
     notes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
   } else if (stage === 2) {
-    // 🌿 Melodía 2: "Arpegio de los Girasoles" - Flowing warm acoustic chords
-    const bmMid = [246.94, 293.66, 369.99, 440.00];
-    const gMid = [196.00, 246.94, 293.66, 392.00];
-    const dMid = [220.00, 293.66, 369.99, 440.00];
-    const aMid = [220.00, 277.18, 329.63, 440.00];
-
-    [bmMid, gMid, dMid, aMid].forEach((chord, cIdx) => {
-      const cTime = now + cIdx * 1.2;
-      chord.forEach((note, nIdx) => {
-        playAcousticNote(ctx, note, cTime + nIdx * 0.22, 1.4, 0.045, 'triangle');
-      });
-    });
+    const notes = [
+      { f: 246.94, t: 0.0, d: 0.7, v: 0.05 },
+      { f: 293.66, t: 0.5, d: 0.7, v: 0.05 },
+      { f: 369.99, t: 1.0, d: 0.8, v: 0.06 },
+      { f: 440.00, t: 1.6, d: 1.2, v: 0.07 },
+      { f: 392.00, t: 2.6, d: 0.8, v: 0.06 },
+      { f: 329.63, t: 3.4, d: 0.9, v: 0.06 },
+      { f: 293.66, t: 4.2, d: 1.5, v: 0.07 },
+    ];
+    playAcousticNote(ctx, 196.00, now, 5.0, 0.03, 'triangle');
+    notes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
   } else if (stage === 3) {
-    // 🐞 Melodía 3: "Sonrisa de Primavera" - Folk guitar acoustic arpeggios
-    const folkChords = [
-      [196.00, 246.94, 392.00, 587.33], // G
-      [261.63, 329.63, 392.00, 523.25], // C
-      [164.81, 246.94, 329.63, 493.88], // Em
-      [220.00, 293.66, 440.00, 587.33], // D
+    const notes = [
+      { f: 329.63, t: 0.0, d: 0.7, v: 0.05 },
+      { f: 392.00, t: 0.6, d: 0.8, v: 0.06 },
+      { f: 493.88, t: 1.2, d: 0.9, v: 0.065 },
+      { f: 440.00, t: 1.9, d: 0.7, v: 0.06 },
+      { f: 392.00, t: 2.5, d: 0.8, v: 0.06 },
+      { f: 329.63, t: 3.2, d: 1.3, v: 0.07 },
     ];
-    folkChords.forEach((chord, cIdx) => {
-      const cTime = now + cIdx * 1.15;
-      playAcousticNote(ctx, chord[0], cTime, 1.2, 0.05, 'triangle');
-      chord.slice(1).forEach((note, nIdx) => {
-        playAcousticNote(ctx, note, cTime + (nIdx + 1) * 0.24, 0.9, 0.04, 'sine');
-      });
-    });
+    playAcousticNote(ctx, 164.81, now, 4.5, 0.03, 'triangle');
+    notes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
   } else {
-    // ✨ Melodía 4: "El Florecer de la Esperanza" - Romantic melodic theme
-    const hangingTree = [
-      { f: 329.63, t: 0.0, d: 0.45, v: 0.06 }, // E4
-      { f: 392.00, t: 0.5, d: 0.45, v: 0.06 }, // G4
-      { f: 440.00, t: 1.0, d: 0.50, v: 0.07 }, // A4
-      { f: 493.88, t: 1.5, d: 0.65, v: 0.07 }, // B4
-      { f: 440.00, t: 2.2, d: 0.50, v: 0.06 }, // A4
-      { f: 392.00, t: 2.7, d: 0.50, v: 0.06 }, // G4
-      { f: 329.63, t: 3.2, d: 0.70, v: 0.06 }, // E4
-      { f: 293.66, t: 3.9, d: 0.55, v: 0.05 }, // D4
-      { f: 329.63, t: 4.5, d: 1.40, v: 0.07 }, // E4
+    const notes = [
+      { f: 293.66, t: 0.0, d: 0.7, v: 0.05 },
+      { f: 369.99, t: 0.5, d: 0.7, v: 0.055 },
+      { f: 440.00, t: 1.0, d: 0.8, v: 0.06 },
+      { f: 587.33, t: 1.6, d: 1.2, v: 0.075 },
+      { f: 493.88, t: 2.6, d: 0.7, v: 0.06 },
+      { f: 440.00, t: 3.2, d: 0.8, v: 0.065 },
+      { f: 369.99, t: 3.9, d: 0.7, v: 0.055 },
+      { f: 293.66, t: 4.6, d: 1.6, v: 0.07 },
     ];
-    playAcousticNote(ctx, 164.81, now, 5.0, 0.035, 'triangle');
-    hangingTree.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
+    playAcousticNote(ctx, 146.83, now, 5.5, 0.035, 'triangle');
+    notes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
   }
 }
 
 /**
- * Start or switch music track for the given movie stage.
- * Immediately terminates any playing audio before starting the new track.
+ * Start or switch music track for the given stage and theme.
  */
-export function startMovieMusic(stage = 1, onStateChange = null) {
+export function startMovieMusic(stage = 1, theme = null, onStateChange = null) {
   try {
     const ctx = getAudioContext();
     if (!ctx) return false;
 
-    // 1. Immediately silence and clear ALL previous audio (ZERO OVERLAP)
     stopAllMusicAudio();
 
     currentActiveStage = stage;
+    if (theme) currentActiveTheme = theme;
     isMusicPlaying = true;
 
-    // 2. Play new stage melody immediately from the start
-    playStageMelody(currentActiveStage);
+    playStageMelody(currentActiveStage, currentActiveTheme);
 
-    // 3. Set loop interval, purging any previous notes on each loop
-    const intervalTime = currentActiveStage === 4 ? 6400 : currentActiveStage === 2 ? 6000 : 5800;
+    const intervalTime = currentActiveTheme === 'cumpleanos' ? 9500 : 6200;
     activeMusicInterval = setInterval(() => {
       if (!isMusicPlaying) return;
       stopAllMusicAudio();
       isMusicPlaying = true;
-      playStageMelody(currentActiveStage);
+      playStageMelody(currentActiveStage, currentActiveTheme);
     }, intervalTime);
 
     if (onStateChange) onStateChange(true);
@@ -432,24 +433,20 @@ export function stopMovieMusic(onStateChange = null) {
   return false;
 }
 
-export function toggleMovieMusic(stage = 1, onStateChange = null) {
+export function toggleMovieMusic(stage = 1, theme = null, onStateChange = null) {
   if (isMusicPlaying) {
     return stopMovieMusic(onStateChange);
   } else {
-    return startMovieMusic(stage, onStateChange);
+    return startMovieMusic(stage, theme, onStateChange);
   }
 }
 
-/**
- * Smoothly transition current playing music when flower blooms to the next stage
- */
-export function switchMovieStageMusic(nextStage, onStateChange = null) {
+export function switchMovieStageMusic(nextStage, theme = null, onStateChange = null) {
   currentActiveStage = nextStage;
+  if (theme) currentActiveTheme = theme;
   if (isMusicPlaying) {
-    startMovieMusic(nextStage, onStateChange);
+    startMovieMusic(nextStage, currentActiveTheme, onStateChange);
   } else {
     notifyMusicListeners();
   }
 }
-
-

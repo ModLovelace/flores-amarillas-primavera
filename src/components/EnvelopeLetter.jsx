@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { Mail, Heart, Sparkles, X, ChevronUp, Feather } from 'lucide-react';
+import { Mail, Sparkles, X, ChevronUp, Feather } from 'lucide-react';
 import { playPaperSound } from '../utils/audioChimes';
 
-export default function EnvelopeLetter({ recipientName, senderName, message, date }) {
+export default function EnvelopeLetter({
+  theme,
+  recipientName,
+  senderName,
+  message,
+  date
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => {
@@ -10,19 +16,22 @@ export default function EnvelopeLetter({ recipientName, senderName, message, dat
     setIsOpen(!isOpen);
   };
 
+  const sealColor = theme?.palette?.waxSealColor || '#EAB308';
+  const themeEmoji = theme?.emoji || '🌻';
+
   return (
-    <section id="carta" className="py-16 px-4 sm:px-6 max-w-4xl mx-auto flex flex-col items-center">
+    <section id="carta" className="py-12 sm:py-16 px-4 sm:px-6 max-w-4xl mx-auto flex flex-col items-center">
       {/* Title & Introduction */}
-      <div className="text-center mb-10">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-semibold tracking-wider uppercase mb-3">
-          <Feather className="w-3.5 h-3.5" />
+      <div className="text-center mb-8 sm:mb-10">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-800 text-xs font-semibold tracking-wider uppercase mb-3">
+          <Feather className="w-3.5 h-3.5 text-amber-600" />
           <span>Palabras del Corazón</span>
         </div>
         <h2 className="font-serif text-3xl sm:text-4xl text-stone-800 font-semibold">
           Una Carta Especial para Ti
         </h2>
         <p className="text-stone-600 font-handwriting text-xl sm:text-2xl mt-1">
-          {isOpen ? 'Leída con todo el amor del mundo' : 'Haz clic en el sello de cera para abrirla'}
+          {isOpen ? 'Leída con todo el cariño del mundo' : 'Haz clic en el sello de cera para abrirla'}
         </p>
       </div>
 
@@ -39,11 +48,8 @@ export default function EnvelopeLetter({ recipientName, senderName, message, dat
 
           {/* Envelope Diagonal Lines (Fold lines) */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
-            {/* Bottom fold */}
             <polygon points="0,240 192,130 384,240" fill="#EBDCCE" opacity="0.6" />
-            {/* Left flap */}
             <polygon points="0,0 160,120 0,240" fill="#ECDDCF" opacity="0.4" />
-            {/* Right flap */}
             <polygon points="384,0 224,120 384,240" fill="#ECDDCF" opacity="0.4" />
           </svg>
 
@@ -51,20 +57,23 @@ export default function EnvelopeLetter({ recipientName, senderName, message, dat
           {!isOpen && (
             <div className="absolute top-2 w-[85%] h-12 bg-amber-50/90 rounded-t border border-amber-200/50 shadow-sm flex items-center justify-center transition-all duration-500">
               <span className="font-handwriting text-stone-600 text-sm tracking-wider">
-                De: {senderName} 💛
+                De: {senderName} {themeEmoji}
               </span>
             </div>
           )}
 
-          {/* Wax Seal Button (Golden Sunflower) */}
+          {/* Wax Seal Button */}
           <div
-            className={`absolute z-30 flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-500 to-amber-400 border-4 border-amber-300/80 shadow-wax-seal transition-all duration-500 ${
+            className={`absolute z-30 flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white/60 shadow-wax-seal transition-all duration-500 ${
               isOpen ? 'scale-75 opacity-70 -translate-y-8' : 'animate-pulse hover:scale-110'
             }`}
+            style={{
+              background: `radial-gradient(circle at 35% 35%, #FFFFFF 0%, ${sealColor} 60%, #451A03 120%)`
+            }}
           >
-            <div className="flex flex-col items-center text-amber-950 font-serif">
-              <Sparkles className="w-5 h-5 text-amber-900" />
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-tighter">
+            <div className="flex flex-col items-center text-white drop-shadow-md">
+              <span className="text-xl sm:text-2xl">{themeEmoji}</span>
+              <span className="text-[8px] sm:text-[9px] uppercase font-bold tracking-tighter font-sans mt-0.5">
                 {isOpen ? 'CERRAR' : 'ABRIR'}
               </span>
             </div>
@@ -89,48 +98,40 @@ export default function EnvelopeLetter({ recipientName, senderName, message, dat
             {/* Close cross button */}
             <button
               onClick={handleToggle}
-              className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-amber-100 text-stone-500 hover:text-stone-800 transition-colors"
+              className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-stone-100 text-stone-500 hover:text-stone-800 transition-colors"
               title="Guardar carta"
             >
               <X className="w-5 h-5" />
             </button>
 
             {/* Letter Header */}
-            <div className="border-b border-amber-200/60 pb-4 mb-6">
+            <div className="border-b border-stone-200 pb-4 mb-6">
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
-                <span className="font-handwriting text-2xl sm:text-3xl text-amber-900 font-bold">
-                  Querida {recipientName},
+                <span className="font-handwriting text-2xl sm:text-3xl text-stone-900 font-bold">
+                  Para: {recipientName} {themeEmoji}
                 </span>
                 <span className="font-serif italic text-stone-500 text-sm">
-                  {date} · Día de la Primavera
+                  {date || theme?.defaultDate}
                 </span>
               </div>
             </div>
 
             {/* Letter Body */}
             <div className="space-y-4 font-serif text-base sm:text-lg text-stone-700 leading-relaxed">
-              <p className="first-letter:text-4xl first-letter:font-bold first-letter:text-amber-600 first-letter:mr-2 first-letter:float-left">
-                Dicen que la primavera llega para despertar a la tierra con flores y colores, pero la verdad es que desde que estás aquí, contigo florece todo.
-              </p>
-              
-              <p>
-                Hoy, 21 de septiembre, la tradición cuenta que quien te regala flores amarillas te está prometiendo amor sincero, luz y un compromiso de cuidarte y verte sonreír siempre. Y tú te mereces no solo un ramo, sino un campo entero lleno de girasoles y luz.
-              </p>
-
-              <blockquote className="my-6 p-4 rounded-xl bg-amber-50/70 border-l-4 border-amber-400 font-handwriting text-xl sm:text-2xl text-amber-950 italic">
-                &ldquo;Él la estaba esperando con una flor amarilla... y ella supo que los sueños más bonitos sí se cumplen cuando estás con la persona correcta.&rdquo;
-              </blockquote>
-
-              <p>
+              <p className="whitespace-pre-line text-stone-800 leading-relaxed">
                 {message}
               </p>
+
+              <blockquote className="my-6 p-4 rounded-xl bg-amber-50/70 border-l-4 border-amber-400 font-handwriting text-xl sm:text-2xl text-stone-800 italic">
+                {theme?.quotes?.[1]?.quote || theme?.quotes?.[0]?.quote}
+              </blockquote>
             </div>
 
             {/* Letter Footer / Signature */}
-            <div className="mt-8 pt-6 border-t border-amber-200/60 flex flex-col items-end">
+            <div className="mt-8 pt-6 border-t border-stone-200 flex flex-col items-end">
               <span className="font-serif italic text-sm text-stone-500">Con todo mi cariño,</span>
-              <span className="font-handwriting text-2xl sm:text-3xl text-amber-900 font-bold mt-1">
-                {senderName} 🌻💛
+              <span className="font-handwriting text-2xl sm:text-3xl text-stone-900 font-bold mt-1">
+                {senderName} {themeEmoji}
               </span>
             </div>
 
@@ -138,7 +139,7 @@ export default function EnvelopeLetter({ recipientName, senderName, message, dat
             <div className="mt-6 flex justify-center">
               <button
                 onClick={handleToggle}
-                className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs sm:text-sm font-sans font-medium transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs sm:text-sm font-sans font-medium transition-colors"
               >
                 <ChevronUp className="w-4 h-4" />
                 <span>Volver a guardar en el sobre</span>
