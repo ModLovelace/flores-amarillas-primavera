@@ -10,7 +10,7 @@ import { ThemeModal } from './components/ThemeSelector';
 import { getTheme } from './config/themes';
 import { getInitialDedication, saveDedicationToStorage } from './utils/urlParams';
 import { switchMovieStageMusic } from './utils/audioChimes';
-import { Heart, Sparkles, Share2, Palette } from 'lucide-react';
+import { Heart, Sparkles, Share2, Palette, BookOpen } from 'lucide-react';
 
 export default function App() {
   const [dedication, setDedication] = useState(getInitialDedication);
@@ -73,6 +73,18 @@ export default function App() {
               </span>
               <Palette className="w-3.5 h-3.5 text-stone-400 group-hover:text-stone-700 ml-0.5" />
             </button>
+
+            <a
+              href="https://regalaflores.modlovelace.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/80 text-xs font-semibold transition-all shadow-2xs hover:scale-105"
+              title="Ver Guía Oficial y configurador"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-amber-600" />
+              <span>Guía Oficial</span>
+              <span className="text-[10px] text-amber-600 font-mono">↗</span>
+            </a>
           </div>
 
           {/* Action Header Buttons */}
@@ -149,6 +161,25 @@ export default function App() {
             <span>Hecho con</span>
             <Heart className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
             <span>para {dedication.to}</span>
+          </div>
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-3 text-stone-500 text-xs">
+            <a
+              href="https://regalaflores.modlovelace.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-stone-900 underline underline-offset-4 decoration-amber-400 font-medium"
+            >
+              📖 Guía Oficial & Configurador
+            </a>
+            <span>•</span>
+            <a
+              href="https://modlovelace.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-stone-900 underline underline-offset-4 decoration-blue-400 font-medium"
+            >
+              modlovelace.com
+            </a>
           </div>
         </div>
       </footer>
