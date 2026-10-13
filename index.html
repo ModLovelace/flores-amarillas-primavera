@@ -6,6 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#FEF9C3" />
     <title>🌻 Feliz Día de la Primavera & Flores Amarillas</title>
+    <!-- Inicialización inmediata de favicon y título según parámetro URL para evitar destellos -->
+    <script>
+      (function() {
+        try {
+          var p = new URLSearchParams(window.location.search);
+          var t = p.get('theme');
+          var to = p.get('to') || 'Ti';
+          var l = document.querySelector("link[rel~='icon']");
+          if (t === 'cumpleanos') {
+            document.title = 'Cumpleaños para ' + to;
+            if (l) l.href = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎂</text></svg>');
+          } else if (t === 'logro-profesional') {
+            document.title = 'Logro Profesional para ' + to;
+            if (l) l.href = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎓</text></svg>');
+          } else if (t === 'aniversario') {
+            document.title = 'Aniversario & Amor para ' + to;
+            if (l) l.href = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💖</text></svg>');
+          }
+        } catch(e) {}
+      })();
+    </script>
 
     <!-- SEO & Social Sharing (WhatsApp / Facebook / Twitter previews) -->
     <meta name="description" content="Un detalle especial para ti en este 21 de septiembre. Que nunca te falten tus flores amarillas ni los motivos para sonreír." />

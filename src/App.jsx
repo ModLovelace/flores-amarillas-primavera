@@ -10,6 +10,7 @@ import { ThemeModal } from './components/ThemeSelector';
 import { getTheme } from './config/themes';
 import { getInitialDedication, saveDedicationToStorage } from './utils/urlParams';
 import { switchMovieStageMusic } from './utils/audioChimes';
+import { setDynamicFavicon } from './utils/favicon';
 import { Heart, Sparkles, Share2, Palette, BookOpen } from 'lucide-react';
 
 export default function App() {
@@ -21,9 +22,11 @@ export default function App() {
 
   const currentTheme = getTheme(dedication.theme);
 
-  // Sync title with recipient and current theme
+  // Sync title and favicon with recipient and current theme
   useEffect(() => {
-    document.title = `${currentTheme.emoji} ${currentTheme.shortName} para ${dedication.to}`;
+    // El favicon muestra la torta (u ocasión correspondiente) y el título el texto limpio
+    document.title = `${currentTheme.shortName} para ${dedication.to}`;
+    setDynamicFavicon(currentTheme.id, currentTheme.emoji);
   }, [dedication.to, currentTheme]);
 
   const handleSelectTheme = (newThemeId) => {
