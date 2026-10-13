@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { Sparkles, Droplets } from 'lucide-react';
 import { switchMovieStageMusic } from '../utils/audioChimes';
@@ -8,6 +8,62 @@ import {
   TrophyLaurelSVG,
   RosesBouquetSVG
 } from './Centerpieces';
+
+// Caché de formas temáticas para reutilizar instancias de canvas-confetti y alto rendimiento
+const THEMATIC_SHAPES_CACHE = new Map();
+
+function getThematicShapes(themeId) {
+  if (THEMATIC_SHAPES_CACHE.has(themeId)) {
+    return THEMATIC_SHAPES_CACHE.get(themeId);
+  }
+
+  const shapes = [];
+  try {
+    if (typeof confetti.shapeFromText === 'function') {
+      if (themeId === 'cumpleanos') {
+        shapes.push(
+          'square',
+          'circle',
+          confetti.shapeFromText({ text: '🎉', scalar: 1.8 }),
+          confetti.shapeFromText({ text: '🎂', scalar: 1.8 }),
+          confetti.shapeFromText({ text: '✨', scalar: 1.4 })
+        );
+      } else if (themeId === 'flores-amarillas') {
+        shapes.push(
+          'circle',
+          confetti.shapeFromText({ text: '🌻', scalar: 2.0 }),
+          confetti.shapeFromText({ text: '🌼', scalar: 1.8 }),
+          confetti.shapeFromText({ text: '✨', scalar: 1.4 })
+        );
+      } else if (themeId === 'logro-profesional') {
+        shapes.push(
+          'circle',
+          confetti.shapeFromText({ text: '🎓', scalar: 2.0 }),
+          confetti.shapeFromText({ text: '⭐', scalar: 1.8 }),
+          confetti.shapeFromText({ text: '🏆', scalar: 2.0 }),
+          confetti.shapeFromText({ text: '✨', scalar: 1.4 })
+        );
+      } else if (themeId === 'aniversario') {
+        shapes.push(
+          'circle',
+          confetti.shapeFromText({ text: '💖', scalar: 2.0 }),
+          confetti.shapeFromText({ text: '❤️', scalar: 1.8 }),
+          confetti.shapeFromText({ text: '🌹', scalar: 2.0 }),
+          confetti.shapeFromText({ text: '✨', scalar: 1.4 })
+        );
+      }
+    }
+  } catch (err) {
+    // Si OffscreenCanvas no está soportado en algún navegador, degradación suave
+  }
+
+  if (shapes.length === 0) {
+    shapes.push('circle', 'square');
+  }
+
+  THEMATIC_SHAPES_CACHE.set(themeId, shapes);
+  return shapes;
+}
 
 export default function InteractiveBouquet({
   recipientName,
@@ -30,13 +86,72 @@ export default function InteractiveBouquet({
   const [showRippleWave, setShowRippleWave] = useState(false);
   const [isBloomingAnimation, setIsBloomingAnimation] = useState(false);
 
+  const canvasRef = useRef(null);
+  const cannonRef = useRef(null);
+  const prevThemeIdRef = useRef(theme.id);
+
   useEffect(() => {
     return () => {
       if (noteTimeoutRef.current) {
         clearTimeout(noteTimeoutRef.current);
       }
+      if (cannonRef.current) {
+        cannonRef.current.reset();
+        cannonRef.current = null;
+      }
     };
   }, []);
+
+  // Ráfaga de partículas confinada estrictamente al canvas local de la pieza central
+  const fireThematicParticles = useCallback((themeId, stage = 1) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    try {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        if (canvas.width !== rect.width || canvas.height !== rect.height) {
+          canvas.width = rect.width;
+          canvas.height = rect.height;
+        }
+      }
+
+      if (!cannonRef.current) {
+        cannonRef.current = confetti.create(canvas, {
+          resize: true,
+          useWorker: false,
+        });
+      }
+
+      const shapes = getThematicShapes(themeId);
+      const colors = theme.palette.particleColors || ['#FDE047', '#FACC15', '#FB7185'];
+
+      cannonRef.current({
+        particleCount: themeId === 'cumpleanos' ? 44 : 36,
+        spread: themeId === 'cumpleanos' ? 68 : 58,
+        startVelocity: themeId === 'cumpleanos' ? 32 : 28,
+        origin: { x: 0.5, y: 0.72 },
+        colors,
+        shapes,
+        gravity: themeId === 'cumpleanos' ? 0.95 : 0.8,
+        ticks: 125,
+        disableForReducedMotion: true,
+      });
+    } catch (err) {
+      // safe fallback
+    }
+  }, [theme.palette.particleColors]);
+
+  // Si cambia la temática desde las pestañas, emitir una ráfaga suave de bienvenida en la pieza central
+  useEffect(() => {
+    if (prevThemeIdRef.current !== theme.id) {
+      prevThemeIdRef.current = theme.id;
+      const t = setTimeout(() => {
+        fireThematicParticles(theme.id, bloomStage);
+      }, 180);
+      return () => clearTimeout(t);
+    }
+  }, [theme.id, bloomStage, fireThematicParticles]);
 
   const triggerBloom = () => {
     setShowRippleWave(true);
@@ -54,15 +169,8 @@ export default function InteractiveBouquet({
     // Switch melody for the active theme
     switchMovieStageMusic(nextStage, theme.id);
 
-    // Festive Confetti burst
-    const confettiColors = theme.palette.particleColors || ['#FDE047', '#FACC15', '#FB7185'];
-    confetti({
-      particleCount: 45,
-      spread: 70,
-      origin: { y: 0.65 },
-      colors: confettiColors,
-      disableForReducedMotion: true,
-    });
+    // Disparo festivo temático confinado estrictamente al espacio de la flor / torta / trofeo / rosas
+    fireThematicParticles(theme.id, nextStage);
 
     // Occasion pop-up note
     const randomQuote = theme.quotes[Math.floor(Math.random() * theme.quotes.length)].quote;
@@ -120,19 +228,35 @@ export default function InteractiveBouquet({
         ))}
       </div>
 
-      {/* The Centerpiece SVG Container */}
-      <div className="relative w-full max-w-[340px] sm:max-w-[440px] h-[390px] sm:h-[460px] flex items-center justify-center transition-all duration-700">
+      {/* The Centerpiece SVG Container con Canvas de partículas confinado */}
+      <div
+        onClick={triggerBloom}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') triggerBloom();
+        }}
+        title="Toca para interactuar y florecer"
+        className="relative w-full max-w-[340px] sm:max-w-[440px] h-[390px] sm:h-[460px] flex items-center justify-center transition-all duration-700 cursor-pointer overflow-hidden rounded-3xl select-none group"
+      >
+        {/* Canvas de partículas temáticas confinado estrictamente a la pieza central */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full pointer-events-none z-30"
+        />
         
         {/* Render Centerpiece according to theme */}
-        {theme.id === 'cumpleanos' ? (
-          <BirthdayCakeSVG bloomStage={bloomStage} />
-        ) : theme.id === 'logro-profesional' ? (
-          <TrophyLaurelSVG bloomStage={bloomStage} />
-        ) : theme.id === 'aniversario' ? (
-          <RosesBouquetSVG bloomStage={bloomStage} />
-        ) : (
-          <SunflowerBouquetSVG bloomStage={bloomStage} />
-        )}
+        <div className="w-full h-full flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
+          {theme.id === 'cumpleanos' ? (
+            <BirthdayCakeSVG bloomStage={bloomStage} />
+          ) : theme.id === 'logro-profesional' ? (
+            <TrophyLaurelSVG bloomStage={bloomStage} />
+          ) : theme.id === 'aniversario' ? (
+            <RosesBouquetSVG bloomStage={bloomStage} />
+          ) : (
+            <SunflowerBouquetSVG bloomStage={bloomStage} />
+          )}
+        </div>
 
         {/* Floating pop-up love note */}
         {activeNote && (
