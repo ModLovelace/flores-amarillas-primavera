@@ -191,25 +191,34 @@ export function BirthdayCakeSVG({ bloomStage = 1 }) {
       <ellipse cx="360" cy="380" rx="14" ry="9" fill="#38BDF8" stroke="#0284C7" strokeWidth="1" />
       <circle cx="260" cy="270" r="10" fill="#F43F5E" />
 
-      {/* CANDLES */}
-      {[-45, 0, 45].map((offX, idx) => (
-        <g key={idx} transform={`translate(${260 + offX}, 200)`}>
-          {/* Candle stick with cute stripes */}
-          <rect x="-5" y="10" width="10" height="60" rx="2" fill="#FEF08A" stroke="#CA8A04" strokeWidth="1" />
-          <line x1="-5" y1="25" x2="5" y2="30" stroke="#F43F5E" strokeWidth="2" />
-          <line x1="-5" y1="45" x2="5" y2="50" stroke="#F43F5E" strokeWidth="2" />
-          {/* Wick */}
-          <line x1="0" y1="10" x2="0" y2="3" stroke="#451A03" strokeWidth="1.5" />
+      {/* 4 CANDLES (uno por cada palito/fase de la torta) */}
+      {[-54, -18, 18, 54].map((offX, idx) => {
+        const isThisCandleLit = bloomStage >= idx + 1;
+        return (
+          <g key={idx} transform={`translate(${260 + offX}, 200)`}>
+            {/* Candle stick with cute stripes */}
+            <rect x="-5" y="10" width="10" height="60" rx="2" fill="#FEF08A" stroke="#CA8A04" strokeWidth="1" />
+            <line x1="-5" y1="25" x2="5" y2="30" stroke="#F43F5E" strokeWidth="2" />
+            <line x1="-5" y1="45" x2="5" y2="50" stroke="#F43F5E" strokeWidth="2" />
+            {/* Wick */}
+            <line x1="0" y1="10" x2="0" y2="3" stroke="#451A03" strokeWidth="1.5" />
 
-          {/* Flame (lights up on stage >= 2) */}
-          {isCandleLit && (
-            <g className="animate-pulse" style={{ animationDuration: `${0.8 + idx * 0.2}s` }}>
-              <ellipse cx="0" cy="-8" rx="6" ry="12" fill="url(#candleFlame)" />
-              <circle cx="0" cy="-5" r="3" fill="#FFFFFF" />
-            </g>
-          )}
-        </g>
-      ))}
+            {/* Flame (se enciende progresivamente por cada fase) */}
+            {isThisCandleLit && (
+              <g className="animate-pulse" style={{ animationDuration: `${0.7 + idx * 0.15}s` }}>
+                <ellipse cx="0" cy="-8" rx="6" ry="12" fill="url(#candleFlame)" />
+                <circle cx="0" cy="-5" r="3" fill="#FFFFFF" />
+              </g>
+            )}
+
+            {/* Número del palito/deseo en la base de la vela */}
+            <circle cx="0" cy="78" r="6.5" fill={isThisCandleLit ? "#F59E0B" : "#CBD5E1"} />
+            <text x="0" y="80.5" textAnchor="middle" fontSize="6.5" fontWeight="bold" fill={isThisCandleLit ? "#78350F" : "#64748B"}>
+              {idx + 1}
+            </text>
+          </g>
+        );
+      })}
 
       {/* Stage 3+: Sparklers & Fireworks */}
       {isSparklers && (
