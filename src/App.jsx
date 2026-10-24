@@ -16,7 +16,13 @@ import { Heart, Sparkles, Share2, Palette, BookOpen } from 'lucide-react';
 export default function App() {
   const [dedication, setDedication] = useState(getInitialDedication);
   const [isPersonalizerOpen, setIsPersonalizerOpen] = useState(false);
-  const [isBragModalOpen, setIsBragModalOpen] = useState(false);
+  const [isBragModalOpen, setIsBragModalOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.has('brag') || params.has('presumir');
+    }
+    return false;
+  });
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [bloomStage, setBloomStage] = useState(1);
 

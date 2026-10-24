@@ -17,6 +17,234 @@ import InstagramIcon from './InstagramIcon';
 import TikTokIcon from './TikTokIcon';
 import { getTheme } from '../config/themes';
 
+// Pinterest-Inspired Aesthetic Styles Per Theme
+const THEME_STYLES = {
+  'flores-amarillas': [
+    {
+      id: 'sunflower',
+      label: '🌻 Dorado Sol',
+      background: 'radial-gradient(circle at 50% 20%, #FFFDF5 0%, #FEF9C3 50%, #FDE047 100%)',
+      titleColor: 'text-stone-900',
+      accentColor: 'text-amber-700',
+      tagBg: 'bg-white/95 text-amber-950 border-amber-300/80 shadow-xs',
+      quoteColor: 'text-stone-800',
+      footerColor: 'text-amber-900 border-amber-300/70',
+      border: 'border-amber-300',
+      glow: 'bg-amber-400/35',
+      musicIconColor: 'text-amber-600',
+      cornerEmoji: '🌻',
+      isDark: false
+    },
+    {
+      id: 'night',
+      label: '🌙 TikTok Glow',
+      background: 'radial-gradient(circle at 50% 25%, #1e1b4b 0%, #0f172a 60%, #020617 100%)',
+      titleColor: 'text-white',
+      accentColor: 'text-yellow-400',
+      tagBg: 'bg-slate-800/90 text-yellow-300 border-yellow-500/40 shadow-xs',
+      quoteColor: 'text-amber-100',
+      footerColor: 'text-amber-200/90 border-slate-700/80',
+      border: 'border-yellow-500/40',
+      glow: 'bg-yellow-400/25',
+      musicIconColor: 'text-yellow-400',
+      cornerEmoji: '✨',
+      isDark: true
+    },
+    {
+      id: 'sunset',
+      label: '🌅 Atardecer Cálido',
+      background: 'radial-gradient(circle at 50% 25%, #FFFBEB 0%, #FED7AA 50%, #F59E0B 100%)',
+      titleColor: 'text-stone-900',
+      accentColor: 'text-amber-900',
+      tagBg: 'bg-white/95 text-amber-950 border-amber-400/80 shadow-xs',
+      quoteColor: 'text-stone-900',
+      footerColor: 'text-amber-950 border-amber-300/60',
+      border: 'border-amber-400',
+      glow: 'bg-orange-400/35',
+      musicIconColor: 'text-orange-600',
+      cornerEmoji: '💛',
+      isDark: false
+    }
+  ],
+  'cumpleanos': [
+    {
+      id: 'pastel',
+      label: '🎂 Pastel & Fresas',
+      background: 'radial-gradient(circle at 50% 20%, #FFF5F7 0%, #FCE7F3 50%, #F472B6 100%)',
+      titleColor: 'text-rose-950',
+      accentColor: 'text-pink-600',
+      tagBg: 'bg-white/95 text-pink-950 border-pink-300/80 shadow-xs',
+      quoteColor: 'text-rose-900',
+      footerColor: 'text-pink-900 border-pink-200',
+      border: 'border-pink-300',
+      glow: 'bg-pink-400/30',
+      musicIconColor: 'text-pink-500',
+      cornerEmoji: '🎂',
+      isDark: false
+    },
+    {
+      id: 'party',
+      label: '✨ Fiesta Neón Glow',
+      background: 'radial-gradient(circle at 50% 20%, #2e1065 0%, #1e102a 60%, #0d0415 100%)',
+      titleColor: 'text-white',
+      accentColor: 'text-pink-400',
+      tagBg: 'bg-purple-950/85 text-pink-300 border-pink-500/40 shadow-xs',
+      quoteColor: 'text-pink-100',
+      footerColor: 'text-pink-200/90 border-purple-900',
+      border: 'border-pink-500/40',
+      glow: 'bg-pink-500/30',
+      musicIconColor: 'text-pink-400',
+      cornerEmoji: '🎉',
+      isDark: true
+    },
+    {
+      id: 'confetti',
+      label: '🥂 Confeti & Durazno',
+      background: 'radial-gradient(circle at 50% 20%, #FFF7ED 0%, #FED7AA 50%, #FB923C 100%)',
+      titleColor: 'text-amber-950',
+      accentColor: 'text-rose-600',
+      tagBg: 'bg-white/95 text-amber-950 border-orange-300/80 shadow-xs',
+      quoteColor: 'text-stone-800',
+      footerColor: 'text-amber-900 border-orange-200',
+      border: 'border-orange-300',
+      glow: 'bg-amber-400/35',
+      musicIconColor: 'text-orange-500',
+      cornerEmoji: '🎈',
+      isDark: false
+    }
+  ],
+  'logro-profesional': [
+    {
+      id: 'prestige',
+      label: '🏆 Azul Triunfo & Oro',
+      background: 'radial-gradient(circle at 50% 18%, #FFFFFF 0%, #EFF6FF 45%, #BFDBFE 100%)',
+      titleColor: 'text-slate-900',
+      accentColor: 'text-blue-700',
+      tagBg: 'bg-white/95 text-blue-950 border-blue-400/70 shadow-xs',
+      quoteColor: 'text-slate-800',
+      footerColor: 'text-blue-900 border-blue-200',
+      border: 'border-blue-400',
+      glow: 'bg-blue-400/25',
+      musicIconColor: 'text-blue-600',
+      cornerEmoji: '🏆',
+      isDark: false
+    },
+    {
+      id: 'gala',
+      label: '✨ Noche de Gala & Oro',
+      background: 'radial-gradient(circle at 50% 22%, #172554 0%, #0f172a 60%, #020617 100%)',
+      titleColor: 'text-white',
+      accentColor: 'text-yellow-400',
+      tagBg: 'bg-slate-900/90 text-yellow-300 border-yellow-500/50 shadow-xs',
+      quoteColor: 'text-blue-100',
+      footerColor: 'text-yellow-200/80 border-slate-800',
+      border: 'border-yellow-500/40',
+      glow: 'bg-yellow-400/25',
+      musicIconColor: 'text-yellow-400',
+      cornerEmoji: '🎓',
+      isDark: true
+    },
+    {
+      id: 'laurel',
+      label: '🌿 Esmeralda Laureles',
+      background: 'radial-gradient(circle at 50% 18%, #F0FDF4 0%, #DCFCE7 45%, #86EFAC 100%)',
+      titleColor: 'text-emerald-950',
+      accentColor: 'text-emerald-700',
+      tagBg: 'bg-white/95 text-emerald-950 border-emerald-400/70 shadow-xs',
+      quoteColor: 'text-emerald-900',
+      footerColor: 'text-emerald-900 border-emerald-300/60',
+      border: 'border-emerald-400',
+      glow: 'bg-emerald-400/30',
+      musicIconColor: 'text-emerald-600',
+      cornerEmoji: '🌟',
+      isDark: false
+    }
+  ],
+  'aniversario': [
+    {
+      id: 'roses',
+      label: '🌹 Rosas de Terciopelo',
+      background: 'radial-gradient(circle at 50% 20%, #FFF1F2 0%, #FFE4E6 50%, #FB7185 100%)',
+      titleColor: 'text-rose-950',
+      accentColor: 'text-rose-700',
+      tagBg: 'bg-white/95 text-rose-950 border-rose-300/80 shadow-xs',
+      quoteColor: 'text-rose-950',
+      footerColor: 'text-rose-950 border-rose-200',
+      border: 'border-rose-400',
+      glow: 'bg-rose-400/30',
+      musicIconColor: 'text-rose-600',
+      cornerEmoji: '🌹',
+      isDark: false
+    },
+    {
+      id: 'wine',
+      label: '🍷 Vino & Medianoche',
+      background: 'radial-gradient(circle at 50% 25%, #4C0519 0%, #2A0815 60%, #0D0005 100%)',
+      titleColor: 'text-white',
+      accentColor: 'text-rose-400',
+      tagBg: 'bg-rose-950/85 text-rose-200 border-rose-500/40 shadow-xs',
+      quoteColor: 'text-rose-100',
+      footerColor: 'text-rose-200/90 border-rose-900',
+      border: 'border-rose-500/40',
+      glow: 'bg-rose-500/30',
+      musicIconColor: 'text-rose-400',
+      cornerEmoji: '💖',
+      isDark: true
+    },
+    {
+      id: 'candlelight',
+      label: '🕯️ Luz de Velas & Oro',
+      background: 'radial-gradient(circle at 50% 20%, #FFFBEB 0%, #FED7AA 45%, #F43F5E 100%)',
+      titleColor: 'text-stone-900',
+      accentColor: 'text-rose-600',
+      tagBg: 'bg-white/95 text-rose-950 border-rose-300/80 shadow-xs',
+      quoteColor: 'text-stone-900',
+      footerColor: 'text-rose-900 border-rose-200',
+      border: 'border-rose-300',
+      glow: 'bg-orange-400/30',
+      musicIconColor: 'text-amber-600',
+      cornerEmoji: '✨',
+      isDark: false
+    }
+  ]
+};
+
+// UI Accent Colors for Modal Controls & Buttons Per Theme
+const THEME_UI_ACCENTS = {
+  'flores-amarillas': {
+    primaryGradient: 'from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:via-yellow-600 hover:to-amber-700 text-stone-900',
+    iconGradient: 'from-amber-400 via-amber-500 to-yellow-600',
+    activeTab: 'border-amber-500 bg-amber-50/90 text-amber-950 font-semibold shadow-xs',
+    ringColor: 'ring-amber-500 border-amber-500',
+    statusBg: 'bg-amber-100/90 border-amber-300 text-amber-950',
+    statusIcon: 'text-amber-600'
+  },
+  'cumpleanos': {
+    primaryGradient: 'from-pink-500 via-rose-500 to-purple-600 hover:from-pink-600 hover:via-rose-600 hover:to-purple-700 text-white',
+    iconGradient: 'from-pink-500 via-rose-500 to-purple-500',
+    activeTab: 'border-pink-500 bg-pink-50/90 text-pink-950 font-semibold shadow-xs',
+    ringColor: 'ring-pink-500 border-pink-500',
+    statusBg: 'bg-pink-100/90 border-pink-300 text-pink-950',
+    statusIcon: 'text-pink-600'
+  },
+  'logro-profesional': {
+    primaryGradient: 'from-blue-600 via-teal-600 to-emerald-600 hover:from-blue-700 hover:via-teal-700 hover:to-emerald-700 text-white',
+    iconGradient: 'from-blue-600 via-teal-600 to-emerald-600',
+    activeTab: 'border-blue-500 bg-blue-50/90 text-blue-950 font-semibold shadow-xs',
+    ringColor: 'ring-blue-500 border-blue-500',
+    statusBg: 'bg-blue-100/90 border-blue-300 text-blue-950',
+    statusIcon: 'text-blue-600'
+  },
+  'aniversario': {
+    primaryGradient: 'from-rose-600 via-red-600 to-pink-700 hover:from-rose-700 hover:via-red-700 hover:to-pink-800 text-white',
+    iconGradient: 'from-rose-500 via-red-500 to-pink-600',
+    activeTab: 'border-rose-500 bg-rose-50/90 text-rose-950 font-semibold shadow-xs',
+    ringColor: 'ring-rose-500 border-rose-500',
+    statusBg: 'bg-rose-100/90 border-rose-300 text-rose-950',
+    statusIcon: 'text-rose-600'
+  }
+};
+
 export default function BragModal({
   isOpen,
   onClose,
@@ -25,13 +253,31 @@ export default function BragModal({
   senderName = 'Alguien que te quiere'
 }) {
   const activeTheme = getTheme(themeId);
+  const activeThemeStyles = THEME_STYLES[themeId] || THEME_STYLES['flores-amarillas'];
+  const activeUI = THEME_UI_ACCENTS[themeId] || THEME_UI_ACCENTS['flores-amarillas'];
+
   const [format, setFormat] = useState('story'); // 'story' (9:16) or 'post' (1:1)
-  const [cardStyle, setCardStyle] = useState('spring'); // 'spring', 'night', 'sunset'
+  const [styleIndex, setStyleIndex] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const s = params.get('style');
+      if (s !== null) {
+        const num = parseInt(s, 10);
+        if (!isNaN(num)) return num;
+        const found = activeThemeStyles.findIndex((item) => item.id === s);
+        if (found !== -1) return found;
+      }
+    }
+    return 0;
+  });
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedImage, setCopiedImage] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const cardRef = useRef(null);
+
+  const safeStyleIndex = styleIndex >= 0 && styleIndex < activeThemeStyles.length ? styleIndex : 0;
+  const currentStyle = activeThemeStyles[safeStyleIndex];
 
   if (!isOpen) return null;
 
@@ -166,45 +412,6 @@ export default function BragModal({
     }, 2500);
   };
 
-  // Theme Styles Configuration
-  const styleVariants = {
-    spring: {
-      background: 'radial-gradient(circle at 50% 20%, #FFFDF5 0%, #FEF9C3 50%, #FDE047 100%)',
-      titleColor: 'text-stone-900',
-      accentColor: 'text-amber-600',
-      tagBg: 'bg-white/90 text-amber-950 border-amber-300/80',
-      quoteColor: 'text-stone-800',
-      footerColor: 'text-amber-900 border-amber-300/70',
-      border: 'border-amber-300',
-      glow: 'bg-amber-400/35',
-      isDark: false
-    },
-    night: {
-      background: 'radial-gradient(circle at 50% 25%, #1e1b4b 0%, #0f172a 60%, #020617 100%)',
-      titleColor: 'text-white',
-      accentColor: 'text-yellow-400',
-      tagBg: 'bg-slate-800/90 text-yellow-300 border-yellow-500/40',
-      quoteColor: 'text-amber-100',
-      footerColor: 'text-amber-200/90 border-slate-700/80',
-      border: 'border-yellow-500/40',
-      glow: 'bg-yellow-400/25',
-      isDark: true
-    },
-    sunset: {
-      background: 'radial-gradient(circle at 50% 25%, #fff1f2 0%, #fde047 50%, #fb923c 100%)',
-      titleColor: 'text-stone-900',
-      accentColor: 'text-rose-700',
-      tagBg: 'bg-white/90 text-rose-950 border-rose-300/80',
-      quoteColor: 'text-stone-900',
-      footerColor: 'text-rose-950 border-rose-300/60',
-      border: 'border-rose-300',
-      glow: 'bg-orange-400/35',
-      isDark: false
-    }
-  };
-
-  const currentStyle = styleVariants[cardStyle];
-
   // Helper for Centerpiece Graphic inside Card
   const renderCardGraphic = () => {
     if (activeTheme.id === 'cumpleanos') {
@@ -329,7 +536,7 @@ export default function BragModal({
             {/* Corner Decorative Icons */}
             <div className="absolute top-3 left-3 text-base sm:text-lg opacity-80 animate-pulse">{activeTheme.emoji}</div>
             <div className="absolute top-3 right-3 text-base sm:text-lg opacity-80 animate-pulse" style={{ animationDelay: '500ms' }}>✨</div>
-            <div className="absolute bottom-3 left-3 text-sm sm:text-base opacity-75">💛</div>
+            <div className="absolute bottom-3 left-3 text-sm sm:text-base opacity-75">{currentStyle.cornerEmoji || activeTheme.emoji}</div>
             <div className="absolute bottom-3 right-3 text-base sm:text-lg opacity-80">{activeTheme.emoji}</div>
 
             {/* Top Date & Event Tag */}
@@ -342,7 +549,7 @@ export default function BragModal({
                 <span className="text-[11px]">✨</span>
               </div>
               {format === 'story' && (
-                <p className={`text-[10px] font-sans tracking-wide mt-1 font-medium ${currentStyle.isDark ? 'text-yellow-200/80' : 'text-stone-700'}`}>
+                <p className={`text-[10px] font-sans tracking-wide mt-1 font-medium ${currentStyle.isDark ? 'text-white/80' : 'text-stone-700'}`}>
                   {activeTheme.shortName}
                 </p>
               )}
@@ -375,8 +582,8 @@ export default function BragModal({
               {/* Trending Sound Tag */}
               {format === 'story' && (
                 <div className="mb-1.5 flex items-center justify-center gap-1 px-2.5 py-0.5 rounded-full bg-black/15 backdrop-blur-xs text-[10px] font-sans font-medium">
-                  <Music2 className="w-3 h-3 text-amber-500 animate-pulse" />
-                  <span className={currentStyle.isDark ? 'text-yellow-200' : 'text-stone-800'}>
+                  <Music2 className={`w-3 h-3 ${currentStyle.musicIconColor} animate-pulse`} />
+                  <span className={currentStyle.isDark ? 'text-white/90' : 'text-stone-800'}>
                     {activeTheme.brag.audio}
                   </span>
                 </div>
@@ -394,9 +601,9 @@ export default function BragModal({
             {/* Bottom Signature & Safe Zone Branding */}
             <div className={`w-full pt-1.5 border-t flex flex-col items-center z-10 ${currentStyle.footerColor}`}>
               <span className="text-[10px] font-sans font-bold flex items-center gap-1">
-                <span>regala-flores-amarillas.vercel.app</span>
+                <span>flores.modlovelace.com</span>
               </span>
-              <span className={`text-[9px] font-sans ${currentStyle.isDark ? 'text-slate-400' : 'text-stone-600'}`}>
+              <span className={`text-[9px] font-sans ${currentStyle.isDark ? 'text-white/70' : 'text-stone-600'}`}>
                 {activeTheme.brag.hashtags}
               </span>
             </div>
@@ -408,7 +615,7 @@ export default function BragModal({
           <div>
             {/* Header */}
             <div className="flex items-center gap-2.5 mb-2">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-pink-500 to-rose-600 flex items-center justify-center text-white shadow-md">
+              <div className={`w-10 h-10 rounded-2xl bg-gradient-to-tr ${activeUI.iconGradient} flex items-center justify-center text-white shadow-md`}>
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
@@ -442,11 +649,11 @@ export default function BragModal({
                   onClick={() => setFormat('story')}
                   className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 ${
                     format === 'story'
-                      ? 'border-amber-500 bg-amber-50/80 text-amber-950 font-semibold shadow-xs'
+                      ? activeUI.activeTab
                       : 'border-stone-200 hover:border-stone-300 text-stone-600'
                   }`}
                 >
-                  <Smartphone className="w-5 h-5 text-amber-600 shrink-0" />
+                  <Smartphone className={`w-5 h-5 shrink-0 ${format === 'story' ? activeUI.statusIcon : 'text-stone-400'}`} />
                   <div>
                     <div className="text-xs font-sans font-bold">Historia / TikTok</div>
                     <div className="text-[10px] text-stone-500 font-sans">9:16 Pantalla completa</div>
@@ -458,11 +665,11 @@ export default function BragModal({
                   onClick={() => setFormat('post')}
                   className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 ${
                     format === 'post'
-                      ? 'border-amber-500 bg-amber-50/80 text-amber-950 font-semibold shadow-xs'
+                      ? activeUI.activeTab
                       : 'border-stone-200 hover:border-stone-300 text-stone-600'
                   }`}
                 >
-                  <Square className="w-5 h-5 text-amber-600 shrink-0" />
+                  <Square className={`w-5 h-5 shrink-0 ${format === 'post' ? activeUI.statusIcon : 'text-stone-400'}`} />
                   <div>
                     <div className="text-xs font-sans font-bold">Post / Feed</div>
                     <div className="text-[10px] text-stone-500 font-sans">1:1 Cuadrado clásico</div>
@@ -477,22 +684,18 @@ export default function BragModal({
                 2. Elige el Estilo Visual
               </label>
               <div className="flex gap-2">
-                {[
-                  { id: 'spring', label: '🌻 Dorado Sol' },
-                  { id: 'night', label: '🌙 TikTok Glow' },
-                  { id: 'sunset', label: '🌸 Romance' }
-                ].map((t) => (
+                {activeThemeStyles.map((style, idx) => (
                   <button
-                    key={t.id}
+                    key={style.id}
                     type="button"
-                    onClick={() => setCardStyle(t.id)}
-                    className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-sans font-medium border transition-all ${
-                      cardStyle === t.id
-                        ? 'ring-2 ring-amber-500 border-amber-500 font-semibold shadow-xs'
+                    onClick={() => setStyleIndex(idx)}
+                    className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-sans font-medium border transition-all text-center ${
+                      safeStyleIndex === idx
+                        ? `ring-2 ${activeUI.ringColor} font-semibold shadow-xs`
                         : 'border-stone-200 hover:border-stone-300 text-stone-700'
                     }`}
                   >
-                    {t.label}
+                    {style.label}
                   </button>
                 ))}
               </div>
@@ -500,8 +703,8 @@ export default function BragModal({
 
             {/* Status message */}
             {statusMessage && (
-              <div className="mt-3 p-2.5 rounded-xl bg-amber-100/90 border border-amber-300 text-amber-950 text-xs font-sans font-medium flex items-center gap-2 animate-in fade-in">
-                <Sparkles className="w-4 h-4 text-amber-600 shrink-0 animate-spin" />
+              <div className={`mt-3 p-2.5 rounded-xl border text-xs font-sans font-medium flex items-center gap-2 animate-in fade-in ${activeUI.statusBg}`}>
+                <Sparkles className={`w-4 h-4 shrink-0 animate-spin ${activeUI.statusIcon}`} />
                 <span>{statusMessage}</span>
               </div>
             )}
@@ -511,7 +714,7 @@ export default function BragModal({
               <button
                 onClick={() => handleNativeShare('Redes')}
                 disabled={isGenerating}
-                className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-pink-500 to-rose-600 hover:from-amber-600 hover:via-pink-600 hover:to-rose-700 text-white font-bold text-sm shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-98 transition-all flex items-center justify-center gap-2"
+                className={`w-full py-3 px-4 rounded-2xl bg-gradient-to-r ${activeUI.primaryGradient} font-bold text-sm shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-98 transition-all flex items-center justify-center gap-2`}
               >
                 {isGenerating ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
