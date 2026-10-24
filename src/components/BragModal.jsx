@@ -256,7 +256,13 @@ export default function BragModal({
   const activeThemeStyles = THEME_STYLES[themeId] || THEME_STYLES['flores-amarillas'];
   const activeUI = THEME_UI_ACCENTS[themeId] || THEME_UI_ACCENTS['flores-amarillas'];
 
-  const [format, setFormat] = useState('story'); // 'story' (9:16) or 'post' (1:1)
+  const [format, setFormat] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const f = new URLSearchParams(window.location.search).get('format');
+      if (f === 'post' || f === 'feed' || f === '1:1') return 'post';
+    }
+    return 'story';
+  });
   const [styleIndex, setStyleIndex] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -517,12 +523,12 @@ export default function BragModal({
           {/* ================= ACTUAL CARD CAPTURED BY HTML-TO-IMAGE ================= */}
           <div
             ref={cardRef}
-            className={`transition-all duration-300 rounded-3xl p-5 sm:p-6 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-2xl border-2 select-none ${
+            className={`transition-all duration-300 rounded-3xl flex flex-col items-center justify-between text-center relative overflow-hidden shadow-2xl border-2 select-none ${
               currentStyle.border
             } ${
               format === 'story'
-                ? 'w-[280px] sm:w-[310px] h-[498px] sm:h-[551px]'
-                : 'w-[290px] sm:w-[340px] h-[290px] sm:h-[340px]'
+                ? 'w-[280px] sm:w-[310px] h-[498px] sm:h-[551px] p-5 sm:p-6'
+                : 'w-[295px] sm:w-[340px] h-[295px] sm:h-[340px] p-3.5 sm:p-4'
             }`}
             style={{
               background: currentStyle.background,
@@ -538,6 +544,16 @@ export default function BragModal({
             <div className="absolute top-3 right-3 text-base sm:text-lg opacity-80 animate-pulse" style={{ animationDelay: '500ms' }}>✨</div>
             <div className="absolute bottom-3 left-3 text-sm sm:text-base opacity-75">{currentStyle.cornerEmoji || activeTheme.emoji}</div>
             <div className="absolute bottom-3 right-3 text-base sm:text-lg opacity-80">{activeTheme.emoji}</div>
+
+            {/* Discreet Vertical Edge Watermark */}
+            <div
+              className={`absolute right-2 top-1/2 -translate-y-1/2 text-[7.5px] font-mono tracking-[0.25em] uppercase select-none pointer-events-none opacity-30 ${
+                currentStyle.isDark ? 'text-white' : 'text-stone-900'
+              }`}
+              style={{ writingMode: 'vertical-rl' }}
+            >
+              ✦ modlovelace.com ✦
+            </div>
 
             {/* Top Date & Event Tag */}
             <div className="pt-0.5 flex flex-col items-center z-10">
@@ -557,16 +573,16 @@ export default function BragModal({
 
             {/* Main Content Area */}
             <div className="my-auto px-1 flex flex-col items-center z-10 w-full">
-              <h3 className={`text-xl sm:text-2xl font-bold leading-tight tracking-tight ${currentStyle.titleColor}`}>
+              <h3 className={`font-bold leading-tight tracking-tight ${format === 'story' ? 'text-xl sm:text-2xl' : 'text-base sm:text-xl'} ${currentStyle.titleColor}`}>
                 {activeTheme.brag.title}
               </h3>
 
-              <div className="mt-1.5 flex items-center justify-center gap-1.5 flex-wrap">
+              <div className="mt-1 flex items-center justify-center gap-1.5 flex-wrap">
                 <span className={`text-xs font-serif italic ${currentStyle.isDark ? 'text-slate-300' : 'text-stone-600'}`}>
                   Para:
                 </span>
                 <span
-                  className={`text-xl sm:text-2xl font-bold tracking-wide ${currentStyle.accentColor}`}
+                  className={`font-bold tracking-wide ${format === 'story' ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'} ${currentStyle.accentColor}`}
                   style={{ fontFamily: "'Caveat', cursive" }}
                 >
                   {recipientName} {activeTheme.emoji}
@@ -574,7 +590,7 @@ export default function BragModal({
               </div>
 
               {/* Graphic Centerpiece */}
-              <div className={`relative flex items-center justify-center ${format === 'story' ? 'my-2 w-28 h-28 sm:w-32 sm:h-32' : 'my-1 w-20 h-20 sm:w-24 sm:h-24'}`}>
+              <div className={`relative flex items-center justify-center ${format === 'story' ? 'my-2 w-28 h-28 sm:w-32 sm:h-32' : 'my-0.5 w-16 h-16 sm:w-20 sm:h-20'}`}>
                 <div className={`absolute inset-0 ${currentStyle.glow} rounded-full blur-lg animate-pulse`} />
                 {renderCardGraphic()}
               </div>
@@ -591,7 +607,7 @@ export default function BragModal({
 
               {/* Occasion Quote */}
               <p
-                className={`text-xs sm:text-sm italic leading-snug px-2 mt-0.5 ${currentStyle.quoteColor}`}
+                className={`italic leading-snug px-2 mt-0.5 ${format === 'story' ? 'text-xs sm:text-sm' : 'text-[11px] sm:text-xs'} ${currentStyle.quoteColor}`}
                 style={{ fontFamily: "'Caveat', cursive" }}
               >
                 {activeTheme.brag.quote}
@@ -600,9 +616,13 @@ export default function BragModal({
 
             {/* Bottom Signature & Safe Zone Branding */}
             <div className={`w-full pt-1.5 border-t flex flex-col items-center z-10 ${currentStyle.footerColor}`}>
-              <span className="text-[10px] font-sans font-bold flex items-center gap-1">
+              <div className="text-[10px] font-sans font-bold flex items-center gap-1.5">
                 <span>flores.modlovelace.com</span>
-              </span>
+                <span className="opacity-40">•</span>
+                <span className={`font-mono text-[9px] tracking-wide ${currentStyle.isDark ? 'text-amber-300/85' : 'text-amber-800/85'}`}>
+                  modlovelace.com
+                </span>
+              </div>
               <span className={`text-[9px] font-sans ${currentStyle.isDark ? 'text-white/70' : 'text-stone-600'}`}>
                 {activeTheme.brag.hashtags}
               </span>

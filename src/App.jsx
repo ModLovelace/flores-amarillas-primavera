@@ -6,6 +6,7 @@ import EnvelopeLetter from './components/EnvelopeLetter';
 import MusicPlayer from './components/MusicPlayer';
 import ShareModal from './components/ShareModal';
 import BragModal from './components/BragModal';
+import Watermark from './components/Watermark';
 import { ThemeModal } from './components/ThemeSelector';
 import { getTheme } from './config/themes';
 import { getInitialDedication, saveDedicationToStorage } from './utils/urlParams';
@@ -195,6 +196,9 @@ export default function App() {
 
       {/* Floating Retro Vinyl Audio Player (Sincronizado dinámicamente) */}
       <MusicPlayer bloomStage={bloomStage} themeId={currentTheme.id} />
+
+      {/* Floating Author Brand Pill */}
+      <Watermark />
 
       {/* Modal for Selecting Occasion / Theme */}
       <ThemeModal
