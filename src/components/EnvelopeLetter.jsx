@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Mail, Sparkles, X, ChevronUp, Feather } from 'lucide-react';
+import { X, ChevronUp, Feather } from 'lucide-react';
 import { playPaperSound } from '../utils/audioChimes';
+import TapHintPill from './TapHintPill';
 
 export default function EnvelopeLetter({
   theme,
@@ -20,7 +21,7 @@ export default function EnvelopeLetter({
   const themeEmoji = theme?.emoji || '🌻';
 
   return (
-    <section id="carta" className="py-12 sm:py-16 px-4 sm:px-6 max-w-4xl mx-auto flex flex-col items-center">
+    <section id="carta" className="scroll-mt-16 py-8 sm:py-12 px-4 sm:px-6 max-w-4xl mx-auto flex flex-col items-center">
       {/* Title & Introduction */}
       <div className="text-center mb-8 sm:mb-10">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-800 text-xs font-semibold tracking-wider uppercase mb-3">
@@ -36,12 +37,22 @@ export default function EnvelopeLetter({
       </div>
 
       {/* Envelope Container */}
-      <div className="relative w-full max-w-lg flex flex-col items-center">
+      <div className="relative w-full max-w-lg flex flex-col items-center pb-5">
         
         {/* The Envelope Graphic */}
-        <div 
+        <div
           onClick={handleToggle}
-          className="relative w-72 sm:w-96 h-48 sm:h-60 bg-[#F5EBE1] border-2 border-[#E3D3C4] rounded-lg shadow-paper cursor-pointer transition-transform duration-300 hover:scale-[1.02] flex items-center justify-center select-none overflow-visible"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleToggle();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-expanded={isOpen}
+          aria-label={isOpen ? 'Cerrar carta especial' : 'Abrir carta especial'}
+          className="relative w-72 sm:w-96 h-48 sm:h-60 bg-[#F5EBE1] border-2 border-[#E3D3C4] rounded-lg shadow-paper cursor-pointer transition-transform duration-300 hover:scale-[1.02] flex items-center justify-center select-none overflow-visible focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
         >
           {/* Top Washi Tape Deco */}
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-28 h-7 washi-tape rotate-[-1.5deg] z-20 rounded-sm opacity-90" />
@@ -62,10 +73,25 @@ export default function EnvelopeLetter({
             </div>
           )}
 
+          {/* Animación concéntrica sobre el sello indicando hacer clic para abrir la carta */}
+          {!isOpen && (
+            <div
+              data-letter-tap-hint
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none z-20 flex items-center justify-center"
+            >
+              <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-amber-400/60 tap-ripple-ring" />
+              <div
+                className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-pink-400/50 tap-ripple-ring"
+                style={{ animationDelay: '0.65s' }}
+              />
+            </div>
+          )}
+
           {/* Wax Seal Button */}
           <div
             className={`absolute z-30 flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white/60 shadow-wax-seal transition-all duration-500 ${
-              isOpen ? 'scale-75 opacity-70 -translate-y-8' : 'animate-pulse hover:scale-110'
+              isOpen ? 'scale-75 opacity-70 -translate-y-8' : 'hover:scale-110'
             }`}
             style={{
               background: `radial-gradient(circle at 35% 35%, #FFFFFF 0%, ${sealColor} 60%, #451A03 120%)`
@@ -86,6 +112,16 @@ export default function EnvelopeLetter({
               {recipientName}
             </span>
           </div>
+
+          {/* Píldora flotante animada invitando a hacer clic para abrir el sobre */}
+          {!isOpen && (
+            <div
+              aria-hidden="true"
+              className="absolute -bottom-5 left-1/2 -translate-x-1/2 z-30 pointer-events-none max-w-[95%]"
+            >
+              <TapHintPill title="Haz clic para abrir" subtitle="Toca el sello de cera" />
+            </div>
+          )}
         </div>
 
         {/* The Letter Modal / Card (Slides out gracefully) */}

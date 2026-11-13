@@ -4,24 +4,20 @@ import Hero from './components/Hero';
 import InteractiveBouquet from './components/InteractiveBouquet';
 import EnvelopeLetter from './components/EnvelopeLetter';
 import MusicPlayer from './components/MusicPlayer';
-import ShareModal from './components/ShareModal';
 import BragModal from './components/BragModal';
 import Watermark from './components/Watermark';
-import { ThemeModal } from './components/ThemeSelector';
+import ActionBanner from './components/ActionBanner';
 import { getTheme } from './config/themes';
 import {
   getInitialDedication,
   getUnresolvedShortId,
-  saveDedicationToStorage,
   writeShortCache
 } from './utils/urlParams';
-import { switchMovieStageMusic } from './utils/audioChimes';
 import { setDynamicFavicon } from './utils/favicon';
-import { Heart, Sparkles, Share2, Palette, BookOpen } from 'lucide-react';
+import { Heart, Sparkles } from 'lucide-react';
 
 export default function App() {
   const [dedication, setDedication] = useState(getInitialDedication);
-  const [isPersonalizerOpen, setIsPersonalizerOpen] = useState(false);
   const [isBragModalOpen, setIsBragModalOpen] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -29,7 +25,6 @@ export default function App() {
     }
     return false;
   });
-  const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [bloomStage, setBloomStage] = useState(1);
 
   const currentTheme = getTheme(dedication.theme);
@@ -56,34 +51,14 @@ export default function App() {
 
   // Sync title and favicon with recipient and current theme
   useEffect(() => {
-    // El favicon muestra la torta (u ocasión correspondiente) y el título el texto limpio
     document.title = `${currentTheme.shortName} para ${dedication.to}`;
     setDynamicFavicon(currentTheme.id, currentTheme.emoji);
   }, [dedication.to, currentTheme]);
 
-  const handleSelectTheme = (newThemeId) => {
-    const newTheme = getTheme(newThemeId);
-    setDedication((prev) => {
-      const isDefaultMsg = prev.message === currentTheme.defaultMessage;
-      const isDefaultDate = prev.date === currentTheme.defaultDate;
-      const updated = {
-        ...prev,
-        theme: newThemeId,
-        message: isDefaultMsg ? newTheme.defaultMessage : prev.message,
-        date: isDefaultDate ? newTheme.defaultDate : prev.date
-      };
-      saveDedicationToStorage(updated);
-      return updated;
-    });
-    // Switch music track to match new theme
-    switchMovieStageMusic(bloomStage, newThemeId);
-  };
-
-  const handleUpdateDedication = (newData) => {
-    setDedication(newData);
-    saveDedicationToStorage(newData);
-    if (newData.theme && newData.theme !== currentTheme.id) {
-      switchMovieStageMusic(bloomStage, newData.theme);
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -92,97 +67,86 @@ export default function App() {
       {/* Dynamic Floating Particles Canvas */}
       <PetalsCanvas themeId={currentTheme.id} />
 
-      {/* Aesthetic Top Navigation Bar */}
+      {/* Clean Top Navigation Bar: ocasión actual + botón Presumir */}
       <nav className="sticky top-0 z-30 w-full bg-white/75 backdrop-blur-md border-b border-stone-200/60 px-4 sm:px-8 py-2.5 transition-all">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Logo & Theme Picker Trigger */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsThemeModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-stone-50 border border-stone-200 text-stone-800 text-xs sm:text-sm font-semibold transition-all shadow-2xs hover:scale-105 active:scale-95 group"
-              title="Cambiar ocasión o temática"
-            >
-              <span className="text-base group-hover:scale-110 transition-transform">{currentTheme.emoji}</span>
-              <span className="font-serif font-bold text-stone-900 tracking-tight">
-                {currentTheme.shortName}
-              </span>
-              <Palette className="w-3.5 h-3.5 text-stone-400 group-hover:text-stone-700 ml-0.5" />
-            </button>
-
-            <a
-              href="https://regalaflores.modlovelace.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/80 text-xs font-semibold transition-all shadow-2xs hover:scale-105"
-              title="Ver Guía Oficial y configurador"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-amber-600" />
-              <span>Guía Oficial</span>
-              <span className="text-[10px] text-amber-600 font-mono">↗</span>
-            </a>
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 border border-stone-200/80 text-stone-800 text-xs sm:text-sm font-semibold shadow-2xs select-none">
+            <span className="text-base">{currentTheme.emoji}</span>
+            <span className="font-serif font-bold text-stone-900 tracking-tight">
+              {currentTheme.shortName}
+            </span>
           </div>
 
-          {/* Action Header Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              onClick={() => setIsBragModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-rose-600 text-white text-xs sm:text-sm font-semibold transition-all shadow-xs hover:scale-105 active:scale-95"
-              title="Presumir este momento en TikTok e Instagram"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-yellow-200" />
-              <span>Presumir</span>
-            </button>
-
-            <button
-              onClick={() => setIsPersonalizerOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-amber-400 hover:bg-amber-500 text-amber-950 text-xs sm:text-sm font-semibold transition-all shadow-xs hover:scale-105 active:scale-95"
-              title="Personalizar nombres y dedicatoria"
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Personalizar &</span>
-              <span>Enviar</span>
-            </button>
-          </div>
+          <button
+            onClick={() => setIsBragModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-rose-600 text-white text-xs sm:text-sm font-semibold transition-all shadow-xs hover:scale-105 active:scale-95 cursor-pointer"
+            title="Presumir este momento en TikTok e Instagram"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-yellow-200" />
+            <span>Presumir</span>
+          </button>
         </div>
       </nav>
 
-      {/* Main Content Sections */}
-      <main className="flex-1 z-10 space-y-8 sm:space-y-16">
-        {/* Section 1: Hero with Occasion Pills */}
+      {/* Main Content Sections in Sequential Narrative Order */}
+      <main className="flex-1 z-10 space-y-6 sm:space-y-12">
+        {/* Section 1: Primera Dedicatoria + Banner a lo ancho Ver Pastel & Velas */}
         <Hero
           theme={currentTheme}
           recipientName={dedication.to}
-          onOpenPersonalizer={() => setIsPersonalizerOpen(true)}
-          onOpenBrag={() => setIsBragModalOpen(true)}
-          onOpenThemeModal={() => setIsThemeModalOpen(true)}
-          onSelectTheme={handleSelectTheme}
         />
 
-        {/* Section 2: Interactive Centerpiece (Flores / Pastel / Trofeo / Rosas) */}
+        {/* Section 2: Pastel / Pieza Central Interactiva + Botón Encender Velas & Pedir Deseo */}
         <section id="ramo" className="scroll-mt-16">
           <InteractiveBouquet
             recipientName={dedication.to}
             theme={currentTheme}
             bloomStage={bloomStage}
             onStageChange={setBloomStage}
-            onOpenBrag={() => setIsBragModalOpen(true)}
           />
         </section>
 
-        {/* Section 3: Wax Sealed Envelope with Letter */}
-        <section id="carta" className="scroll-mt-16">
-          <EnvelopeLetter
-            theme={currentTheme}
-            recipientName={dedication.to}
-            senderName={dedication.from}
-            message={dedication.message}
-            date={dedication.date}
+        {/* Banner a lo ancho para continuar bajando a la Carta Secreta */}
+        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6">
+          <ActionBanner
+            dataBanner="carta"
+            onClick={() => scrollToSection('carta')}
+            emoji="💌"
+            title="Carta Secreta"
+            subtitle="Sigue bajando para descubrir tus palabras especiales"
+            className={currentTheme.palette.buttonGradient}
+            chipClassName="bg-white/45 text-stone-900"
           />
-        </section>
+        </div>
+
+        {/* Section 3: Sobre con Sello de Cera y Animación para Abrir la Carta */}
+        <EnvelopeLetter
+          theme={currentTheme}
+          recipientName={dedication.to}
+          senderName={dedication.from}
+          message={dedication.message}
+          date={dedication.date}
+        />
+
+        {/* Final Full-width CTA: Presumir */}
+        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-2">
+          <ActionBanner
+            dataBanner="presumir"
+            onClick={() => setIsBragModalOpen(true)}
+            LeadingIcon={Sparkles}
+            TrailingIcon={Sparkles}
+            animateTrailing={false}
+            title="Presumir"
+            subtitle="Presume este detalle especial en TikTok e Instagram"
+            titleAttr="Presumir este momento en TikTok e Instagram"
+            className="bg-gradient-to-r from-amber-500 via-pink-500 to-rose-600 hover:from-amber-600 hover:via-pink-600 hover:to-rose-700 text-white"
+            chipClassName="bg-white/20 text-yellow-200"
+          />
+        </div>
       </main>
 
       {/* Aesthetic Footer */}
-      <footer className="relative z-10 mt-16 pt-10 pb-36 sm:pb-24 border-t border-stone-200/60 bg-white/40 text-center text-stone-600 text-xs sm:text-sm">
+      <footer className="relative z-10 mt-14 pt-10 pb-36 sm:pb-24 border-t border-stone-200/60 bg-white/40 text-center text-stone-600 text-xs sm:text-sm">
         <div className="max-w-4xl mx-auto px-4 flex flex-col items-center gap-3">
           <div className="flex items-center gap-2 text-stone-800 font-serif text-base font-semibold">
             <span>{currentTheme.emoji}</span>
@@ -197,16 +161,7 @@ export default function App() {
             <Heart className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
             <span>para {dedication.to}</span>
           </div>
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3 text-stone-500 text-xs">
-            <a
-              href="https://regalaflores.modlovelace.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-stone-900 underline underline-offset-4 decoration-amber-400 font-medium"
-            >
-              📖 Guía Oficial & Configurador
-            </a>
-            <span>•</span>
+          <div className="pt-1 flex items-center justify-center text-stone-500 text-xs">
             <a
               href="https://modlovelace.com"
               target="_blank"
@@ -224,22 +179,6 @@ export default function App() {
 
       {/* Floating Author Brand Pill */}
       <Watermark />
-
-      {/* Modal for Selecting Occasion / Theme */}
-      <ThemeModal
-        isOpen={isThemeModalOpen}
-        onClose={() => setIsThemeModalOpen(false)}
-        activeThemeId={currentTheme.id}
-        onSelectTheme={handleSelectTheme}
-      />
-
-      {/* Modal for Personalizing Names, Occasion and Link Sharing */}
-      <ShareModal
-        isOpen={isPersonalizerOpen}
-        onClose={() => setIsPersonalizerOpen(false)}
-        dedication={dedication}
-        onUpdateDedication={handleUpdateDedication}
-      />
 
       {/* Modal for Boasting on TikTok & Instagram */}
       <BragModal

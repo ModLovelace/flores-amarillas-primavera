@@ -38,7 +38,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
-  position: relative;
 }
 
 .washi-tape-pink {
@@ -266,6 +265,32 @@
   animation: cakeFlameFlicker 0.95s ease-in-out infinite;
 }
 
+@keyframes cakeFlameIgnite {
+  0% {
+    -webkit-transform: scale3d(0.2, 0.2, 1);
+    transform: scale3d(0.2, 0.2, 1);
+    opacity: 0;
+  }
+  55% {
+    -webkit-transform: scale3d(1.24, 1.24, 1);
+    transform: scale3d(1.24, 1.24, 1);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+.cake-flame-ignite {
+  transform-box: fill-box;
+  -webkit-transform-origin: 50% 90%;
+  transform-origin: 50% 90%;
+  -webkit-animation: cakeFlameIgnite 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: cakeFlameIgnite 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 @keyframes cakeHaloPulse {
   0%, 100% {
     -webkit-transform: scale3d(0.92, 0.92, 1);
@@ -401,6 +426,23 @@
 .tap-finger-press {
   -webkit-animation: tapFingerPress 2s ease-in-out infinite;
   animation: tapFingerPress 2s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes arrowGuideBounce {
+  0%, 100% {
+    -webkit-transform: translate3d(0, -2px, 0);
+    transform: translate3d(0, -2px, 0);
+  }
+  50% {
+    -webkit-transform: translate3d(0, 5px, 0);
+    transform: translate3d(0, 5px, 0);
+  }
+}
+
+.arrow-guide-bounce {
+  -webkit-animation: arrowGuideBounce 1.45s ease-in-out infinite;
+  animation: arrowGuideBounce 1.45s ease-in-out infinite;
   will-change: transform;
 }
 

@@ -231,7 +231,7 @@ export function BirthdayCakeSVG({ bloomStage = 1 }) {
 
             {/* Flame + Warm Glow (sin atributo transform en nodo animado para compatibilidad Safari) */}
             {isThisCandleLit && (
-              <g>
+              <g className="cake-flame-ignite">
                 <circle
                   cx="0"
                   cy="-10"

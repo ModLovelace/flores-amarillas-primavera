@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import confetti from 'canvas-confetti';
-import { Sparkles, Droplets, Hand, MousePointerClick } from 'lucide-react';
+import { Sparkles, Droplets, MousePointerClick } from 'lucide-react';
 import { startMovieMusic, isAudioCurrentlyPlaying } from '../utils/audioChimes';
+import TapHintPill from './TapHintPill';
 import {
   SunflowerBouquetSVG,
   BirthdayCakeSVG,
@@ -148,7 +149,6 @@ export default function InteractiveBouquet({
   theme,
   bloomStage: externalBloomStage,
   onStageChange,
-  onOpenBrag,
 }) {
   const [internalBloomStage, setInternalBloomStage] = useState(1);
   const bloomStage = externalBloomStage !== undefined ? externalBloomStage : internalBloomStage;
@@ -266,7 +266,7 @@ export default function InteractiveBouquet({
   const tapPrompt = getCenterpieceTapPrompt(theme.id);
 
   return (
-    <div id="centro" className="relative flex flex-col items-center justify-center py-6 px-4 max-w-4xl mx-auto">
+    <div id="centro" className="scroll-mt-16 relative flex flex-col items-center justify-center py-6 px-4 max-w-4xl mx-auto">
       {/* Background Glow */}
       <div
         className={`absolute w-72 sm:w-96 h-72 sm:h-96 rounded-full blur-3xl -z-10 pointer-events-none transition-all duration-1000 ${
@@ -342,20 +342,7 @@ export default function InteractiveBouquet({
 
             {/* Píldora flotante inferior con puntero animado haciendo gesto de toque */}
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 max-w-[92%]">
-              <div className="tap-nudge-float inline-flex items-center gap-2.5 bg-white/95 backdrop-blur-md border border-amber-300/90 shadow-lg rounded-full px-3.5 py-2 text-stone-800 whitespace-nowrap">
-                <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-amber-100 text-amber-700 shrink-0">
-                  <span className="absolute inset-0 rounded-full bg-amber-400/40 tap-ripple-ring" />
-                  <Hand className="w-4 h-4 tap-finger-press" />
-                </span>
-                <div className="flex flex-col text-left leading-tight">
-                  <span className="font-sans text-xs font-bold text-stone-900">
-                    {tapPrompt.title}
-                  </span>
-                  <span className="font-sans text-[10px] text-amber-700 font-medium">
-                    {tapPrompt.subtitle}
-                  </span>
-                </div>
-              </div>
+              <TapHintPill title={tapPrompt.title} subtitle={tapPrompt.subtitle} />
             </div>
           </div>
         )}
@@ -410,18 +397,6 @@ export default function InteractiveBouquet({
         <p className="text-xs sm:text-sm text-stone-500 font-sans text-center max-w-md">
           {bloomCount === 0 ? theme.actionSubtext : theme.counterText(bloomCount, recipientName)}
         </p>
-
-        {/* Presumir CTA */}
-        {onOpenBrag && (
-          <button
-            onClick={onOpenBrag}
-            className="mt-1 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white hover:bg-stone-50 text-stone-800 border border-stone-200 text-xs sm:text-sm font-sans font-semibold shadow-xs hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-200"
-            title="Presumir este momento en TikTok e Instagram"
-          >
-            <Sparkles className="w-4 h-4 text-amber-500" />
-            <span>✨ Presumir este momento</span>
-          </button>
-        )}
       </div>
     </div>
   );
