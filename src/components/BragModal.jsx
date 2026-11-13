@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { toBlob } from 'html-to-image';
 import {
   Download,
@@ -283,9 +283,83 @@ export default function BragModal({
   const [copiedImage, setCopiedImage] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const cardRef = useRef(null);
+  const warmedBlobRef = useRef({ key: '', blob: null });
+  const inFlightBlobRef = useRef({ key: '', promise: null });
+  const statusTimerRef = useRef(null);
+  const shareAttemptRef = useRef(0);
 
   const safeStyleIndex = styleIndex >= 0 && styleIndex < activeThemeStyles.length ? styleIndex : 0;
   const currentStyle = activeThemeStyles[safeStyleIndex];
+  const cardCacheKey = `${activeTheme.id}|${format}|${safeStyleIndex}|${recipientName}|${senderName}`;
+
+  const setTimedStatus = useCallback((msg, durationMs = 0) => {
+    if (statusTimerRef.current) {
+      clearTimeout(statusTimerRef.current);
+      statusTimerRef.current = null;
+    }
+    setStatusMessage(msg);
+    if (msg && durationMs > 0) {
+      statusTimerRef.current = setTimeout(() => {
+        setStatusMessage((prev) => (prev === msg ? '' : prev));
+        statusTimerRef.current = null;
+      }, durationMs);
+    }
+  }, []);
+
+  const captureCardBlob = useCallback(async (targetKey) => {
+    if (!cardRef.current) return null;
+    if (warmedBlobRef.current.key === targetKey && warmedBlobRef.current.blob) {
+      return warmedBlobRef.current.blob;
+    }
+    if (inFlightBlobRef.current.key === targetKey && inFlightBlobRef.current.promise) {
+      return inFlightBlobRef.current.promise;
+    }
+
+    const renderPromise = Promise.race([
+      toBlob(cardRef.current, {
+        quality: 0.96,
+        pixelRatio: 2,
+        cacheBust: false,
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Tiempo de render agotado')), 8000)),
+    ])
+      .then((blob) => {
+        if (blob) {
+          warmedBlobRef.current = { key: targetKey, blob };
+        }
+        return blob;
+      })
+      .finally(() => {
+        if (inFlightBlobRef.current.key === targetKey) {
+          inFlightBlobRef.current = { key: '', promise: null };
+        }
+      });
+
+    inFlightBlobRef.current = { key: targetKey, promise: renderPromise };
+    return renderPromise;
+  }, []);
+
+  // Pre-render PNG in background while modal is open so Safari/mobile share keeps synchronous user gesture
+  useEffect(() => {
+    if (!isOpen) {
+      shareAttemptRef.current++;
+      setIsGenerating(false);
+      setTimedStatus('', 0);
+      return;
+    }
+    const timer = setTimeout(() => {
+      captureCardBlob(cardCacheKey).catch(() => {});
+    }, 380);
+    return () => clearTimeout(timer);
+  }, [isOpen, cardCacheKey, captureCardBlob, setTimedStatus]);
+
+  useEffect(() => {
+    return () => {
+      if (statusTimerRef.current) {
+        clearTimeout(statusTimerRef.current);
+      }
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -296,15 +370,15 @@ export default function BragModal({
   };
 
   const getCustomUrl = () => buildShareUrl(sharePayload);
+  const getSafeFileName = () =>
+    `${activeTheme.id}-${recipientName.toLowerCase().replace(/\s+/g, '-')}-${format}.png`;
 
-  // Generate PNG Blob from the Card
-  const generateBlob = async () => {
-    if (!cardRef.current) return null;
-    return await toBlob(cardRef.current, {
-      quality: 0.98,
-      pixelRatio: 3, // HD sharpness (1080p equivalent)
-      cacheBust: true,
-    });
+  // Sync fast path or async capture with single cached in-flight promise
+  const getOrGenerateBlob = async () => {
+    if (warmedBlobRef.current.key === cardCacheKey && warmedBlobRef.current.blob) {
+      return warmedBlobRef.current.blob;
+    }
+    return await captureCardBlob(cardCacheKey);
   };
 
   const downloadBlob = (blob, filename) => {
@@ -318,66 +392,101 @@ export default function BragModal({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
-  // 📲 Native Share for Mobile (Instagram, TikTok, WhatsApp, etc.)
+  // 📲 Native Share for Mobile / Safari (never traps spinner or hangs on "Abriendo menú de compartir...")
   const handleNativeShare = async (platformName = 'Redes') => {
+    const attemptId = ++shareAttemptRef.current;
+    const fileName = getSafeFileName();
+    let capturedBlob = null;
+
     try {
-      setIsGenerating(true);
-      setStatusMessage(`Generando formato para ${platformName}...`);
-
-      const blob = await generateBlob();
-      if (!blob) throw new Error('No se pudo generar la imagen');
-
-      const fileName = `${activeTheme.id}-${recipientName.toLowerCase().replace(/\s+/g, '-')}-${format}.png`;
-      const file = new File([blob], fileName, { type: 'image/png' });
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        setStatusMessage('Abriendo menú de compartir...');
-        await navigator.share({
-          files: [file],
-          title: `${activeTheme.brag.title} ${activeTheme.emoji}`,
-          text: `${activeTheme.brag.title} ${activeTheme.brag.hashtags} ${getCustomUrl()}`,
-        });
-        setStatusMessage('¡Compartido con éxito!');
-        setTimeout(() => setStatusMessage(''), 3000);
+      if (warmedBlobRef.current.key === cardCacheKey && warmedBlobRef.current.blob) {
+        capturedBlob = warmedBlobRef.current.blob;
       } else {
-        // Fallback: Automatic download on desktop or unsupported devices
-        downloadBlob(blob, fileName);
-        setStatusMessage('¡Imagen HD descargada lista para compartir!');
-        setTimeout(() => setStatusMessage(''), 3500);
+        setIsGenerating(true);
+        setTimedStatus(`Generando formato para ${platformName}...`, 0);
+        capturedBlob = await getOrGenerateBlob();
+      }
+
+      if (attemptId !== shareAttemptRef.current) return;
+      if (!capturedBlob) throw new Error('No se pudo generar la imagen');
+
+      const file = new File([capturedBlob], fileName, { type: 'image/png' });
+      const shareData = {
+        files: [file],
+        title: `${activeTheme.brag.title} ${activeTheme.emoji}`,
+        text: `${activeTheme.brag.title} ${activeTheme.brag.hashtags} ${getCustomUrl()}`,
+      };
+      const canShareFull = Boolean(navigator.canShare && navigator.canShare(shareData));
+      const canShareFilesOnly = !canShareFull && Boolean(navigator.canShare && navigator.canShare({ files: [file] }));
+
+      if (canShareFull || canShareFilesOnly) {
+        // Libera el estado de carga antes de delegar al menú nativo para no bloquear controles
+        setIsGenerating(false);
+        setTimedStatus('Abriendo menú de compartir...', 0);
+
+        const slowShareHintTimer = setTimeout(() => {
+          if (attemptId === shareAttemptRef.current) {
+            setTimedStatus('Si no se abrió el menú, usa Descargar (HD).', 4000);
+          }
+        }, 3000);
+
+        try {
+          await navigator.share(canShareFull ? shareData : { files: [file] });
+        } finally {
+          clearTimeout(slowShareHintTimer);
+        }
+
+        if (attemptId !== shareAttemptRef.current) return;
+        setTimedStatus('¡Compartido con éxito!', 3000);
+      } else {
+        // Fallback: descarga directa en escritorio o navegadores sin Web Share de archivos
+        downloadBlob(capturedBlob, fileName);
+        setTimedStatus('¡Imagen HD descargada lista para compartir!', 3500);
       }
     } catch (err) {
-      if (err.name !== 'AbortError') {
-        console.warn('Share error, downloading instead:', err);
+      if (attemptId !== shareAttemptRef.current) return;
+
+      if (err?.name === 'AbortError') {
+        // Usuario cerró/canceló el menú de compartir: limpiar mensaje para no quedarse en "Abriendo..."
+        setTimedStatus('', 0);
+      } else {
+        console.warn('Share fallback triggered:', err);
         try {
-          const blob = await generateBlob();
-          if (blob) {
-            downloadBlob(blob, `${activeTheme.id}-${recipientName}-${format}.png`);
-            setStatusMessage('¡Imagen descargada!');
+          const fallbackBlob = capturedBlob || (await getOrGenerateBlob());
+          if (attemptId !== shareAttemptRef.current) return;
+          if (fallbackBlob) {
+            downloadBlob(fallbackBlob, fileName);
+            setTimedStatus('¡Imagen HD descargada lista para compartir!', 3500);
+          } else {
+            setTimedStatus('Usa Descargar (HD) para guardar tu tarjeta.', 3500);
           }
-        } catch (e) {}
+        } catch {
+          setTimedStatus('No se pudo abrir compartir; intenta con Descargar (HD).', 3500);
+        }
       }
     } finally {
-      setIsGenerating(false);
+      if (attemptId === shareAttemptRef.current) {
+        setIsGenerating(false);
+      }
     }
   };
 
   // 📥 Download Direct HD PNG
   const handleDownload = async () => {
     try {
-      setIsGenerating(true);
-      setStatusMessage('Generando imagen en alta resolución...');
-      const blob = await generateBlob();
+      let blob = warmedBlobRef.current.key === cardCacheKey ? warmedBlobRef.current.blob : null;
+      if (!blob) {
+        setIsGenerating(true);
+        setTimedStatus('Generando imagen en alta resolución...', 0);
+        blob = await getOrGenerateBlob();
+      }
       if (blob) {
-        downloadBlob(
-          blob,
-          `${activeTheme.id}-${recipientName.toLowerCase().replace(/\s+/g, '-')}-${format}.png`
-        );
-        setStatusMessage('¡Descarga completada con éxito!');
-        setTimeout(() => setStatusMessage(''), 3000);
+        downloadBlob(blob, getSafeFileName());
+        setTimedStatus('¡Descarga completada con éxito!', 3000);
       }
     } catch (err) {
       console.error(err);
-      setStatusMessage('Error al descargar');
+      setTimedStatus('Error al descargar', 3000);
     } finally {
       setIsGenerating(false);
     }
@@ -386,24 +495,26 @@ export default function BragModal({
   // 📋 Copy Image to Clipboard (Desktop)
   const handleCopyImage = async () => {
     try {
-      setIsGenerating(true);
-      const blob = await generateBlob();
+      let blob = warmedBlobRef.current.key === cardCacheKey ? warmedBlobRef.current.blob : null;
+      if (!blob) {
+        setIsGenerating(true);
+        blob = await getOrGenerateBlob();
+      }
       if (blob && navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob })
         ]);
         setCopiedImage(true);
-        setStatusMessage('¡Imagen copiada al portapapeles! Pégala con Ctrl+V');
+        setTimedStatus('¡Imagen copiada al portapapeles! Pégala con Ctrl+V', 3000);
         setTimeout(() => {
           setCopiedImage(false);
-          setStatusMessage('');
         }, 3000);
       } else {
-        handleDownload();
+        await handleDownload();
       }
     } catch (err) {
       console.warn('Clipboard write failed, downloading instead:', err);
-      handleDownload();
+      await handleDownload();
     } finally {
       setIsGenerating(false);
     }
@@ -415,13 +526,12 @@ export default function BragModal({
     try {
       await navigator.clipboard.writeText(url);
       setCopiedLink(true);
-      setStatusMessage('¡Enlace corto copiado para tu historia o biografía!');
+      setTimedStatus('¡Enlace corto copiado para tu historia o biografía!', 2500);
       setTimeout(() => {
         setCopiedLink(false);
-        setStatusMessage('');
       }, 2500);
     } catch {
-      setStatusMessage('No se pudo copiar el enlace automáticamente');
+      setTimedStatus('No se pudo copiar el enlace automáticamente', 2500);
     }
   };
 
@@ -730,8 +840,15 @@ export default function BragModal({
 
             {/* Status message */}
             {statusMessage && (
-              <div className={`mt-3 p-2.5 rounded-xl border text-xs font-sans font-medium flex items-center gap-2 animate-in fade-in ${activeUI.statusBg}`}>
-                <Sparkles className={`w-4 h-4 shrink-0 animate-spin ${activeUI.statusIcon}`} />
+              <div
+                data-brag-status
+                className={`mt-3 p-2.5 rounded-xl border text-xs font-sans font-medium flex items-center gap-2 animate-in fade-in ${activeUI.statusBg}`}
+              >
+                {isGenerating ? (
+                  <Loader2 className={`w-4 h-4 shrink-0 animate-spin ${activeUI.statusIcon}`} />
+                ) : (
+                  <Sparkles className={`w-4 h-4 shrink-0 ${activeUI.statusIcon}`} />
+                )}
                 <span>{statusMessage}</span>
               </div>
             )}
