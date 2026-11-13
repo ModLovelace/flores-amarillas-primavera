@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import confetti from 'canvas-confetti';
-import { Sparkles, Droplets } from 'lucide-react';
+import { Sparkles, Droplets, Hand, MousePointerClick } from 'lucide-react';
 import { startMovieMusic, isAudioCurrentlyPlaying } from '../utils/audioChimes';
 import {
   SunflowerBouquetSVG,
@@ -117,57 +117,28 @@ function getThematicShapes(themeId) {
   return shapes;
 }
 
-function getStickMeta(themeId, index) {
-  const num = index + 1;
+function getCenterpieceTapPrompt(themeId) {
   switch (themeId) {
     case 'cumpleanos':
       return {
-        unit: 'Palito',
-        title: `Palito ${num}`,
-        icon: '🕯️',
-        activeIcon: '🔥',
-        statusActive: 'Vela encendida',
-        statusWaiting: 'Por encender',
-        headerText: '🎂 Los 4 Palitos de Deseos de la Torta',
-        subText: 'Cada palito representa una vela encendida con un deseo para tu nueva vuelta al sol',
-        accentBorder: 'border-amber-400 ring-2 ring-amber-400/50 bg-amber-50/90 shadow-md shadow-amber-200/50',
+        title: 'Toca el pastel',
+        subtitle: 'Enciende las 4 velas y pide tu deseo',
       };
     case 'logro-profesional':
       return {
-        unit: 'Pilar',
-        title: `Pilar ${num}`,
-        icon: '🏆',
-        activeIcon: '⭐',
-        statusActive: 'Pilar alcanzado',
-        statusWaiting: 'Próxima meta',
-        headerText: '🏆 Los 4 Pilares del Triunfo & Reconocimiento',
-        subText: 'Cada pilar conmemora un paso firme en tu camino de estudio, disciplina y éxito',
-        accentBorder: 'border-blue-400 ring-2 ring-blue-400/50 bg-blue-50/90 shadow-md shadow-blue-200/50',
+        title: 'Toca el trofeo',
+        subtitle: 'Activa las 4 estrellas de tu triunfo',
       };
     case 'aniversario':
       return {
-        unit: 'Rosa',
-        title: `Rosa ${num}`,
-        icon: '🌹',
-        activeIcon: '💖',
-        statusActive: 'Rosa en flor',
-        statusWaiting: 'Por florecer',
-        headerText: '🌹 Las 4 Rosas de Nuestra Historia de Amor',
-        subText: 'Cada rosa guarda una promesa y un recuerdo inolvidable vivido a tu lado',
-        accentBorder: 'border-rose-400 ring-2 ring-rose-400/50 bg-rose-50/90 shadow-md shadow-rose-200/50',
+        title: 'Toca las rosas',
+        subtitle: 'Ilumina cada momento especial',
       };
     case 'flores-amarillas':
     default:
       return {
-        unit: 'Tallo',
-        title: `Tallo ${num}`,
-        icon: '🌻',
-        activeIcon: '✨',
-        statusActive: 'Tallo florecido',
-        statusWaiting: 'Por florecer',
-        headerText: '🌻 Los 4 Tallos del Ramo Primaveral',
-        subText: 'Cada tallo aporta una flor radiante y un mensaje lleno de calidez y luz',
-        accentBorder: 'border-amber-400 ring-2 ring-amber-400/50 bg-amber-50/90 shadow-md shadow-amber-200/50',
+        title: 'Toca el ramo',
+        subtitle: 'Haz florecer sus 4 etapas',
       };
   }
 }
@@ -291,17 +262,8 @@ export default function InteractiveBouquet({
     fireThematicParticles(theme.id, nextStage);
   };
 
-  const handleSelectStage = (targetStage) => {
-    setBloomStage(targetStage);
-    setBloomCount((c) => c + 1);
-    playCenterpiecePulse();
-    fireThematicParticles(theme.id, targetStage);
-    if (!isAudioCurrentlyPlaying()) {
-      startMovieMusic(targetStage, theme.id);
-    }
-  };
-
   const currentStageInfo = theme.stageNames[bloomStage - 1] || theme.stageNames[0];
+  const tapPrompt = getCenterpieceTapPrompt(theme.id);
 
   return (
     <div id="centro" className="relative flex flex-col items-center justify-center py-6 px-4 max-w-4xl mx-auto">
@@ -363,6 +325,54 @@ export default function InteractiveBouquet({
           ref={canvasRef}
           className="absolute inset-0 w-full h-full pointer-events-none z-30"
         />
+
+        {/* Indicador visual animado que invita al usuario a tocar el pastel o pieza central */}
+        {bloomCount === 0 && (
+          <div
+            data-tap-hint
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none z-20 flex items-center justify-center"
+          >
+            {/* Ondas concéntricas de invitación sobre la pieza central */}
+            <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-full border-2 border-amber-400/55 tap-ripple-ring" />
+            <div
+              className="absolute w-44 h-44 sm:w-52 sm:h-52 rounded-full border-2 border-pink-400/45 tap-ripple-ring"
+              style={{ animationDelay: '0.7s' }}
+            />
+
+            {/* Píldora flotante inferior con puntero animado haciendo gesto de toque */}
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 max-w-[92%]">
+              <div className="tap-nudge-float inline-flex items-center gap-2.5 bg-white/95 backdrop-blur-md border border-amber-300/90 shadow-lg rounded-full px-3.5 py-2 text-stone-800 whitespace-nowrap">
+                <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-amber-100 text-amber-700 shrink-0">
+                  <span className="absolute inset-0 rounded-full bg-amber-400/40 tap-ripple-ring" />
+                  <Hand className="w-4 h-4 tap-finger-press" />
+                </span>
+                <div className="flex flex-col text-left leading-tight">
+                  <span className="font-sans text-xs font-bold text-stone-900">
+                    {tapPrompt.title}
+                  </span>
+                  <span className="font-sans text-[10px] text-amber-700 font-medium">
+                    {tapPrompt.subtitle}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Sugerencia discreta tras el primer toque mientras queden etapas por activar */}
+        {bloomCount > 0 && bloomStage < 4 && (
+          <div
+            data-tap-hint-next
+            aria-hidden="true"
+            className="absolute bottom-3 right-3 pointer-events-none z-20"
+          >
+            <div className="tap-nudge-float inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-sm border border-amber-300/80 shadow-md rounded-full px-3 py-1 text-[11px] font-sans font-semibold text-stone-700">
+              <MousePointerClick className="w-3.5 h-3.5 text-amber-600" />
+              <span>Toca otra vez ({bloomStage}/4)</span>
+            </div>
+          </div>
+        )}
         
         {/* Render Centerpiece according to theme */}
         <div className="w-full h-full flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
@@ -377,100 +387,6 @@ export default function InteractiveBouquet({
               <SunflowerBouquetSVG bloomStage={bloomStage} />
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Visualización de todos los mensajes simultáneamente como palitos en la torta */}
-      <div className="mt-6 w-full max-w-4xl px-2">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mb-3 text-center sm:text-left">
-          <div>
-            <h3 className="font-serif font-bold text-sm sm:text-base text-stone-800 flex items-center justify-center sm:justify-start gap-2">
-              <span>{getStickMeta(theme.id, 0).headerText}</span>
-            </h3>
-            <p className="text-[11px] text-stone-500 font-sans">
-              {getStickMeta(theme.id, 0).subText} · <span className="text-amber-700 font-medium">Toca cualquier mensaje para encenderlo</span>
-            </p>
-          </div>
-          <span className="text-[11px] font-mono px-3 py-1 rounded-full bg-white/80 border border-stone-200 text-stone-600 shadow-2xs whitespace-nowrap">
-            {bloomStage} de 4 {theme.id === 'cumpleanos' ? 'velas encendidas' : 'fases activas'}
-          </span>
-        </div>
-
-        {/* Grid de los 4 palitos / mensajes */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {theme.quotes.map((q, idx) => {
-            const meta = getStickMeta(theme.id, idx);
-            const isLit = bloomStage >= idx + 1;
-            const isCurrent = bloomStage === idx + 1;
-            const stageInfo = theme.stageNames[idx] || { name: `Fase ${idx + 1}` };
-
-            return (
-              <div
-                key={idx}
-                role="button"
-                tabIndex={0}
-                onClick={() => handleSelectStage(idx + 1)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleSelectStage(idx + 1);
-                  }
-                }}
-                className={`relative flex flex-col justify-between p-3.5 rounded-2xl border transition-all duration-300 text-left cursor-pointer select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
-                  isCurrent
-                    ? `${meta.accentBorder} scale-[1.02] shadow-md`
-                    : isLit
-                    ? 'border-amber-300/80 bg-white/90 shadow-2xs hover:border-amber-400 hover:shadow-xs'
-                    : 'border-stone-200/70 bg-white/60 opacity-75 hover:opacity-100 hover:border-stone-300'
-                }`}
-              >
-                {/* Visual Stick Header (como palito en la torta con su vela/icono) */}
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-stone-200/60">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className={`text-base transition-transform group-hover:scale-125 ${isCurrent ? 'animate-bounce' : ''}`}>
-                      {isLit ? meta.activeIcon : meta.icon}
-                    </span>
-                    <div className="min-w-0">
-                      <div className="font-mono text-xs font-bold text-stone-800 tracking-wide flex items-center gap-1 truncate">
-                        <span>{meta.title}</span>
-                        {isCurrent && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping inline-block" />
-                        )}
-                      </div>
-                      <div className="text-[10px] text-stone-500 font-sans font-medium truncate max-w-[110px]">
-                        {stageInfo.name.split('&')[0]}
-                      </div>
-                    </div>
-                  </div>
-
-                  <span
-                    className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full border shrink-0 transition-colors ${
-                      isCurrent
-                        ? 'bg-amber-400 text-amber-950 border-amber-500 font-bold'
-                        : isLit
-                        ? 'bg-amber-100 text-amber-900 border-amber-300 font-semibold'
-                        : 'bg-stone-100 text-stone-400 border-stone-200'
-                    }`}
-                  >
-                    {isCurrent ? 'Activo' : isLit ? 'Encendido' : `Paso ${idx + 1}`}
-                  </span>
-                </div>
-
-                {/* Texto del Mensaje / Deseo */}
-                <p className="font-serif italic text-xs text-stone-700 leading-relaxed mb-2.5 flex-1 line-clamp-4 hover:line-clamp-none">
-                  {q.quote}
-                </p>
-
-                {/* Pie del palito / autor */}
-                <div className="pt-2 border-t border-stone-100/80 flex items-center justify-between text-[10px] font-sans text-stone-400">
-                  <span className="truncate max-w-[110px]">{q.author}</span>
-                  <span className="text-amber-600 font-mono font-medium text-[9px] group-hover:underline">
-                    {isCurrent ? '● En curso' : 'Tocar ➔'}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
         </div>
       </div>
 

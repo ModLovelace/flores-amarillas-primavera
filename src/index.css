@@ -333,6 +333,77 @@
   transform: translateZ(0);
 }
 
+/* 👆 Safari-safe Tap Invitation Animations (indica al usuario tocar la pieza central) */
+@keyframes tapRippleRing {
+  0% {
+    -webkit-transform: scale3d(0.72, 0.72, 1);
+    transform: scale3d(0.72, 0.72, 1);
+    opacity: 0.75;
+  }
+  70% {
+    -webkit-transform: scale3d(1.22, 1.22, 1);
+    transform: scale3d(1.22, 1.22, 1);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: scale3d(1.26, 1.26, 1);
+    transform: scale3d(1.26, 1.26, 1);
+    opacity: 0;
+  }
+}
+
+.tap-ripple-ring {
+  -webkit-animation: tapRippleRing 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation: tapRippleRing 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes tapNudgeFloat {
+  0%, 100% {
+    -webkit-transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  40% {
+    -webkit-transform: translate3d(0, -6px, 0) scale3d(1.02, 1.02, 1);
+    transform: translate3d(0, -6px, 0) scale3d(1.02, 1.02, 1);
+  }
+  58% {
+    -webkit-transform: translate3d(0, 1px, 0) scale3d(0.96, 0.96, 1);
+    transform: translate3d(0, 1px, 0) scale3d(0.96, 0.96, 1);
+  }
+  72% {
+    -webkit-transform: translate3d(0, -2px, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, -2px, 0) scale3d(1, 1, 1);
+  }
+}
+
+.tap-nudge-float {
+  -webkit-animation: tapNudgeFloat 2s ease-in-out infinite;
+  animation: tapNudgeFloat 2s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes tapFingerPress {
+  0%, 100% {
+    -webkit-transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(-10deg);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(-10deg);
+  }
+  45% {
+    -webkit-transform: translate3d(0, -4px, 0) scale3d(1.08, 1.08, 1) rotate(-6deg);
+    transform: translate3d(0, -4px, 0) scale3d(1.08, 1.08, 1) rotate(-6deg);
+  }
+  60% {
+    -webkit-transform: translate3d(0, 2px, 0) scale3d(0.88, 0.88, 1) rotate(-14deg);
+    transform: translate3d(0, 2px, 0) scale3d(0.88, 0.88, 1) rotate(-14deg);
+  }
+}
+
+.tap-finger-press {
+  -webkit-animation: tapFingerPress 2s ease-in-out infinite;
+  animation: tapFingerPress 2s ease-in-out infinite;
+  will-change: transform;
+}
+
 /* 🌿 Ambient Gentle Breeze Sway for Lush Bouquet */
 @keyframes gentleBreeze {
   0%, 100% {
