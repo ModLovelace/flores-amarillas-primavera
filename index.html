@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#FEF9C3" />
     <title>🌻 Feliz Día de la Primavera & Flores Amarillas</title>
-    <!-- Inicialización inmediata de favicon y título según parámetro URL para evitar destellos -->
+    <!-- __DEDICATION_HYDRATE__ -->
+    <!-- Inicialización inmediata de favicon y título según parámetro URL o estado hidratado -->
     <script>
       (function() {
         try {
+          var init = window.__INITIAL_DEDICATION__;
           var p = new URLSearchParams(window.location.search);
-          var t = p.get('theme');
-          var to = p.get('to') || 'Ti';
+          var t = (init && init.theme) || p.get('theme');
+          var to = (init && init.to) || p.get('to') || 'Ti';
           var l = document.querySelector("link[rel~='icon']");
           if (t === 'cumpleanos') {
             document.title = 'Cumpleaños para ' + to;
@@ -33,7 +35,8 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="🌻 Flores Amarillas para Ti | Feliz Día de la Primavera" />
     <meta property="og:description" content="Alguien muy especial te ha enviado un ramo de flores amarillas y una carta secreta. ¡Ábrelo!" />
-    <meta property="og:image" content="/favicon.svg" />
+    <meta property="og:image" content="https://flores.modlovelace.com/og/flores-amarillas.png" />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Google Fonts: Cormorant Garamond, Caveat, Plus Jakarta Sans, Dancing Script -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

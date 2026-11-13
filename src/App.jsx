@@ -9,7 +9,12 @@ import BragModal from './components/BragModal';
 import Watermark from './components/Watermark';
 import { ThemeModal } from './components/ThemeSelector';
 import { getTheme } from './config/themes';
-import { getInitialDedication, saveDedicationToStorage } from './utils/urlParams';
+import {
+  getInitialDedication,
+  getUnresolvedShortId,
+  saveDedicationToStorage,
+  writeShortCache
+} from './utils/urlParams';
 import { switchMovieStageMusic } from './utils/audioChimes';
 import { setDynamicFavicon } from './utils/favicon';
 import { Heart, Sparkles, Share2, Palette, BookOpen } from 'lucide-react';
@@ -28,6 +33,26 @@ export default function App() {
   const [bloomStage, setBloomStage] = useState(1);
 
   const currentTheme = getTheme(dedication.theme);
+
+  // Hydrate /s/:id from /api/s if accessed without server-injected HTML (e.g., local Vite dev)
+  useEffect(() => {
+    const shortId = getUnresolvedShortId();
+    if (!shortId) return;
+
+    let active = true;
+    fetch(`/api/s?id=${encodeURIComponent(shortId)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((payload) => {
+        if (!active || !payload?.ok || !payload.dedication) return;
+        writeShortCache(payload.dedication, `${window.location.origin}/s/${shortId}`);
+        setDedication(payload.dedication);
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Sync title and favicon with recipient and current theme
   useEffect(() => {
@@ -223,6 +248,7 @@ export default function App() {
         themeId={currentTheme.id}
         recipientName={dedication.to}
         senderName={dedication.from}
+        dedication={dedication}
       />
     </div>
   );

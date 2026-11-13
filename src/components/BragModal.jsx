@@ -16,6 +16,7 @@ import {
 import InstagramIcon from './InstagramIcon';
 import TikTokIcon from './TikTokIcon';
 import { getTheme } from '../config/themes';
+import { buildShareUrl, resolveShortShareUrl } from '../utils/urlParams';
 
 // Pinterest-Inspired Aesthetic Styles Per Theme
 const THEME_STYLES = {
@@ -250,7 +251,8 @@ export default function BragModal({
   onClose,
   themeId = 'flores-amarillas',
   recipientName = 'Mi Persona Favorita',
-  senderName = 'Alguien que te quiere'
+  senderName = 'Alguien que te quiere',
+  dedication = null
 }) {
   const activeTheme = getTheme(themeId);
   const activeThemeStyles = THEME_STYLES[themeId] || THEME_STYLES['flores-amarillas'];
@@ -287,13 +289,13 @@ export default function BragModal({
 
   if (!isOpen) return null;
 
-  const getCustomUrl = () => {
-    const url = new URL(window.location.origin + window.location.pathname);
-    if (themeId && themeId !== 'flores-amarillas') url.searchParams.set('theme', themeId);
-    if (recipientName) url.searchParams.set('to', recipientName);
-    if (senderName) url.searchParams.set('from', senderName);
-    return url.toString();
+  const sharePayload = dedication || {
+    theme: themeId,
+    to: recipientName,
+    from: senderName
   };
+
+  const getCustomUrl = () => buildShareUrl(sharePayload);
 
   // Generate PNG Blob from the Card
   const generateBlob = async () => {
@@ -408,14 +410,19 @@ export default function BragModal({
   };
 
   // 🔗 Copy Link
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(getCustomUrl());
-    setCopiedLink(true);
-    setStatusMessage('¡Enlace copiado para pegarlo en tu historia o biografía!');
-    setTimeout(() => {
-      setCopiedLink(false);
-      setStatusMessage('');
-    }, 2500);
+  const handleCopyLink = async () => {
+    const { url } = await resolveShortShareUrl(sharePayload);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedLink(true);
+      setStatusMessage('¡Enlace corto copiado para tu historia o biografía!');
+      setTimeout(() => {
+        setCopiedLink(false);
+        setStatusMessage('');
+      }, 2500);
+    } catch {
+      setStatusMessage('No se pudo copiar el enlace automáticamente');
+    }
   };
 
   // Helper for Centerpiece Graphic inside Card

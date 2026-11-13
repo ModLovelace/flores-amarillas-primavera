@@ -1,37 +1,66 @@
-import React, { useState } from 'react';
-import { X, Copy, Check, Send, Sparkles, RefreshCw } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { X, Copy, Check, Send, Sparkles, RefreshCw, Link2, Share2, Loader2 } from 'lucide-react';
 import { THEMES, THEME_KEYS, getTheme } from '../config/themes';
-import { buildShareUrl, saveDedicationToStorage } from '../utils/urlParams';
+import { resolveThemeMeta } from '../../shared/dedication.js';
+import {
+  buildCompactShareUrl,
+  buildWhatsAppShareUrl,
+  getCachedShortShareUrl,
+  resolveShortShareUrl,
+  saveDedicationToStorage
+} from '../utils/urlParams';
 
 export default function ShareModal({ isOpen, onClose, dedication, onUpdateDedication }) {
   const [formData, setFormData] = useState(dedication);
   const [copied, setCopied] = useState(false);
+  const [isShortening, setIsShortening] = useState(false);
+  const [resolvedUrl, setResolvedUrl] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(dedication);
+      setResolvedUrl(getCachedShortShareUrl(dedication));
+      setCopied(false);
+    }
+  }, [isOpen, dedication]);
 
   if (!isOpen) return null;
 
   const currentTheme = getTheme(formData.theme);
+  const cachedShort = resolvedUrl || getCachedShortShareUrl(formData);
+  const compactUrl = buildCompactShareUrl(formData);
+  const previewUrl = cachedShort || compactUrl;
+  const isShortActive = Boolean(cachedShort);
+  const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setResolvedUrl(null);
+    setCopied(false);
   };
 
   const handleThemeChange = (newThemeId) => {
     const newTheme = getTheme(newThemeId);
-    setFormData((prev) => ({
-      ...prev,
+    const nextData = {
+      ...formData,
       theme: newThemeId,
       message: newTheme.defaultMessage,
       date: newTheme.defaultDate
-    }));
+    };
+    setFormData(nextData);
+    setResolvedUrl(getCachedShortShareUrl(nextData));
+    setCopied(false);
   };
 
   const handleResetDefaultMessage = () => {
-    setFormData((prev) => ({
-      ...prev,
+    const nextData = {
+      ...formData,
       message: currentTheme.defaultMessage,
       date: currentTheme.defaultDate
-    }));
+    };
+    setFormData(nextData);
+    setResolvedUrl(getCachedShortShareUrl(nextData));
   };
 
   const handleSave = (e) => {
@@ -41,25 +70,94 @@ export default function ShareModal({ isOpen, onClose, dedication, onUpdateDedica
     onClose();
   };
 
-  const shareUrl = buildShareUrl(formData);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    });
+  const resolveCurrentUrl = async () => {
+    const existing = getCachedShortShareUrl(formData);
+    if (existing) {
+      setResolvedUrl(existing);
+      return existing;
+    }
+    setIsShortening(true);
+    try {
+      const result = await resolveShortShareUrl(formData);
+      if (result.mode === 'short') {
+        setResolvedUrl(result.url);
+      }
+      return result.url;
+    } finally {
+      setIsShortening(false);
+    }
   };
 
-  const handleWhatsApp = () => {
-    let text = `🌻 ¡Hola ${formData.to}! Te preparé un detalle especial por el Día de las Flores Amarillas: ${shareUrl}`;
-    if (formData.theme === 'cumpleanos') {
-      text = `🎂 ¡Hola ${formData.to}! Te preparé un detalle muy especial para celebrar tu cumpleaños: ${shareUrl}`;
-    } else if (formData.theme === 'logro-profesional') {
-      text = `🎓 ¡Muchas felicidades ${formData.to}! Te preparé este homenaje por tu gran logro profesional: ${shareUrl}`;
-    } else if (formData.theme === 'aniversario') {
-      text = `💖 ¡Hola mi amor ${formData.to}! Te preparé un detalle especial por nuestro aniversario: ${shareUrl}`;
+  const copyTextSafe = async (text) => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return;
     }
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    const helper = document.createElement('textarea');
+    helper.value = text;
+    helper.setAttribute('readonly', '');
+    helper.style.position = 'fixed';
+    helper.style.opacity = '0';
+    document.body.appendChild(helper);
+    helper.select();
+    document.execCommand('copy');
+    document.body.removeChild(helper);
+  };
+
+  const handleCopy = async () => {
+    onUpdateDedication(formData);
+    saveDedicationToStorage(formData);
+    const finalUrl = await resolveCurrentUrl();
+    try {
+      await copyTextSafe(finalUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  const handleWhatsApp = async () => {
+    onUpdateDedication(formData);
+    saveDedicationToStorage(formData);
+
+    const existing = getCachedShortShareUrl(formData);
+    if (existing) {
+      window.open(buildWhatsAppShareUrl(formData, existing), '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // Abrir pestaña dentro del gesto síncrono del usuario para evitar bloqueo de popups en Safari/Chrome
+    const popup = window.open('about:blank', '_blank');
+    if (popup && popup.document) {
+      popup.document.write(
+        '<p style="font-family:sans-serif;text-align:center;margin-top:40vh;color:#57534e">Preparando enlace corto para WhatsApp...</p>'
+      );
+    }
+
+    const finalUrl = await resolveCurrentUrl();
+    const waUrl = buildWhatsAppShareUrl(formData, finalUrl);
+    if (popup && !popup.closed) {
+      popup.location.replace(waUrl);
+    } else {
+      window.location.assign(waUrl);
+    }
+  };
+
+  const handleNativeShare = async () => {
+    onUpdateDedication(formData);
+    saveDedicationToStorage(formData);
+    const shareUrl = previewUrl;
+    const meta = resolveThemeMeta(formData.theme);
+    try {
+      await navigator.share({
+        title: meta.ogTitle(formData.to, formData.from),
+        text: meta.whatsappText(formData.to, '').replace(/:\s*$/, ''),
+        url: shareUrl
+      });
+    } catch {
+      // Cancelado por el usuario
+    }
   };
 
   return (
@@ -87,7 +185,7 @@ export default function ShareModal({ isOpen, onClose, dedication, onUpdateDedica
             Hazlo Único & Especial
           </h3>
           <p className="text-stone-600 text-xs sm:text-sm mt-1">
-            Elige la ocasión, los nombres y la dedicatoria para generar un enlace listo para compartir.
+            Elige la ocasión, los nombres y la dedicatoria para generar un enlace corto listo para compartir.
           </p>
         </div>
 
@@ -130,6 +228,7 @@ export default function ShareModal({ isOpen, onClose, dedication, onUpdateDedica
               <input
                 type="text"
                 name="to"
+                maxLength={80}
                 value={formData.to}
                 onChange={handleChange}
                 placeholder="Ej: Camila, Mi amor..."
@@ -145,6 +244,7 @@ export default function ShareModal({ isOpen, onClose, dedication, onUpdateDedica
               <input
                 type="text"
                 name="from"
+                maxLength={80}
                 value={formData.from}
                 onChange={handleChange}
                 placeholder="Ej: Mateo, Tu amiga..."
@@ -172,6 +272,7 @@ export default function ShareModal({ isOpen, onClose, dedication, onUpdateDedica
             <textarea
               name="message"
               rows={3}
+              maxLength={1500}
               value={formData.message}
               onChange={handleChange}
               placeholder="Escribe tus palabras especiales..."
@@ -179,8 +280,33 @@ export default function ShareModal({ isOpen, onClose, dedication, onUpdateDedica
             />
           </div>
 
+          {/* Compact / Short URL Preview Pill */}
+          <div className="rounded-2xl bg-stone-50 border border-stone-200/80 px-3.5 py-2.5 flex items-center justify-between gap-2">
+            <div className="min-w-0 flex items-center gap-2">
+              <Link2 className="w-4 h-4 text-amber-600 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[11px] font-mono text-stone-700 truncate">{previewUrl}</p>
+                <p className="text-[10px] text-stone-500">
+                  {isShortActive
+                    ? `⚡ Link ultra corto (${previewUrl.length} caracteres)`
+                    : `📦 Enlace compacto (${previewUrl.length} caracteres) · se acorta al compartir`}
+                </p>
+              </div>
+            </div>
+            {!isShortActive && (
+              <button
+                type="button"
+                onClick={resolveCurrentUrl}
+                disabled={isShortening}
+                className="shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-amber-50 border border-stone-200 text-[11px] font-semibold text-stone-700 transition-colors disabled:opacity-60"
+              >
+                {isShortening ? 'Acortando...' : 'Acortar'}
+              </button>
+            )}
+          </div>
+
           {/* Action buttons */}
-          <div className="pt-2 flex flex-col gap-2.5 font-sans">
+          <div className="pt-1 flex flex-col gap-2.5 font-sans">
             <button
               type="submit"
               className={`w-full py-3 rounded-full font-bold text-sm shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-98 transition-all ${currentTheme.palette.buttonGradient}`}
@@ -188,21 +314,27 @@ export default function ShareModal({ isOpen, onClose, dedication, onUpdateDedica
               Aplicar cambios a esta página {currentTheme.emoji}
             </button>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 type="button"
                 onClick={handleCopy}
-                className="py-2.5 px-3 rounded-full bg-white border border-stone-200 hover:bg-stone-50 text-stone-800 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+                disabled={isShortening}
+                className="flex-1 py-2.5 px-3 rounded-full bg-white border border-stone-200 hover:bg-stone-50 text-stone-800 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs disabled:opacity-60"
               >
-                {copied ? (
+                {isShortening ? (
+                  <>
+                    <Loader2 className="w-4 h-4 text-amber-600 animate-spin" />
+                    <span>Generando enlace...</span>
+                  </>
+                ) : copied ? (
                   <>
                     <Check className="w-4 h-4 text-emerald-600" />
-                    <span className="text-emerald-700 font-semibold">¡Enlace copiado!</span>
+                    <span className="text-emerald-700 font-semibold">¡Enlace corto copiado!</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-4 h-4 text-stone-500" />
-                    <span>Copiar Enlace Personalizado</span>
+                    <span>Copiar Enlace Corto</span>
                   </>
                 )}
               </button>
@@ -210,11 +342,24 @@ export default function ShareModal({ isOpen, onClose, dedication, onUpdateDedica
               <button
                 type="button"
                 onClick={handleWhatsApp}
-                className="py-2.5 px-3 rounded-full bg-[#25D366] hover:bg-[#20BD5A] text-white font-medium text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs"
+                disabled={isShortening}
+                className="flex-1 py-2.5 px-3 rounded-full bg-[#25D366] hover:bg-[#20BD5A] text-white font-medium text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs disabled:opacity-60"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Compartir por WhatsApp</span>
               </button>
+
+              {canNativeShare && (
+                <button
+                  type="button"
+                  onClick={handleNativeShare}
+                  title="Compartir con otra app"
+                  className="py-2.5 px-3.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-800 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span className="sm:hidden">Otras apps</span>
+                </button>
+              )}
             </div>
           </div>
         </form>

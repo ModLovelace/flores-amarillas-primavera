@@ -1,3 +1,5 @@
+import { DEFAULT_THEME_ID, THEME_BASE_META } from '../../shared/dedication.js';
+
 /**
  * Configuración central de Temas y Ocasiones (Inspiración Pinterest & Marketing Viral)
  * Soporta:
@@ -9,10 +11,7 @@
 
 export const THEMES = {
   'flores-amarillas': {
-    id: 'flores-amarillas',
-    name: 'Flores Amarillas & Primavera',
-    shortName: 'Flores Amarillas',
-    emoji: '🌻',
+    ...THEME_BASE_META['flores-amarillas'],
     tagline: 'Tradición del 21 de Septiembre · Luz y Cariño',
     categoryBadge: '🌻 Tradición de Primavera',
     primaryColor: 'amber',
@@ -22,10 +21,6 @@ export const THEMES = {
     headlineHighlight: 'flores amarillas',
     headlineSuffix: '',
     subtitle: 'Porque la primavera no empieza en el calendario, empieza cuando personas tan maravillosas como tú iluminan los días con su sonrisa.',
-    defaultTo: 'Mi Persona Favorita',
-    defaultFrom: 'Alguien que te adora',
-    defaultDate: '21 de Septiembre',
-    defaultMessage: 'En este 21 de septiembre, quería recordarte lo especial que eres. Que nunca te falten motivos para sonreír, ni flores amarillas en tu vida. Eres la luz y la primavera más bonita de mis días.',
     palette: {
       bgGradient: 'bg-gradient-to-b from-amber-50/80 via-cream-100 to-amber-100/50',
       heroTagBg: 'bg-sunflower-100/90 border-sunflower-300 text-sunflower-900',
@@ -86,10 +81,7 @@ export const THEMES = {
   },
 
   'cumpleanos': {
-    id: 'cumpleanos',
-    name: 'Feliz Cumpleaños',
-    shortName: 'Cumpleaños',
-    emoji: '🎂',
+    ...THEME_BASE_META['cumpleanos'],
     tagline: 'Celebra una Nueva Vuelta al Sol · Magia y Alegría',
     categoryBadge: '🎂 Fiesta & Deseos',
     primaryColor: 'pink',
@@ -99,10 +91,6 @@ export const THEMES = {
     headlineHighlight: 'Feliz Cumpleaños',
     headlineSuffix: '!',
     subtitle: 'Hoy el mundo celebra tu existencia, tu luz y todas las sonrisas que contagias a quienes tenemos la suerte de tenerte en nuestra vida. ¡Pide un deseo!',
-    defaultTo: 'Cumpleañera(o) Estrella',
-    defaultFrom: 'Quien te quiere con el alma',
-    defaultDate: 'Hoy es tu Cumpleaños',
-    defaultMessage: '¡Feliz Cumpleaños! Que esta nueva vuelta al sol esté repleta de bendiciones, metas cumplidas, viajes soñados, salud y amor infinito. Gracias por iluminar nuestros días con tu chispa inigualable. ¡A celebrar en grande!',
     palette: {
       bgGradient: 'bg-gradient-to-b from-pink-50/80 via-rose-50/60 to-purple-50/40',
       heroTagBg: 'bg-pink-100/90 border-pink-300 text-pink-900',
@@ -163,10 +151,7 @@ export const THEMES = {
   },
 
   'logro-profesional': {
-    id: 'logro-profesional',
-    name: 'Logro Profesional & Nuevo Comienzo',
-    shortName: 'Logro Profesional',
-    emoji: '🎓',
+    ...THEME_BASE_META['logro-profesional'],
     tagline: 'Graduación, Ascenso & Metas Cumplidas · Orgullo y Éxito',
     categoryBadge: '🎓 Orgullo & Éxito',
     primaryColor: 'emerald',
@@ -176,10 +161,6 @@ export const THEMES = {
     headlineHighlight: 'gran logro profesional',
     headlineSuffix: '',
     subtitle: 'Detrás de cada meta alcanzada hay noches de esfuerzo, pasión y constancia. Hoy el mundo reconoce tu brillantez. ¡Esto es solo el comienzo!',
-    defaultTo: 'Gran Profesional & Triunfador(a)',
-    defaultFrom: 'Tu mayor admirador(a)',
-    defaultDate: 'Día de la Victoria',
-    defaultMessage: '¡Muchísimas felicidades por este enorme logro! Tu dedicación, talento y perseverancia rinden frutos hoy. Que este éxito sea el primer escalón de una trayectoria llena de triunfos y grandes satisfacciones profesionales.',
     palette: {
       bgGradient: 'bg-gradient-to-b from-emerald-50/70 via-slate-50 to-teal-50/50',
       heroTagBg: 'bg-emerald-100/90 border-emerald-300 text-emerald-900',
@@ -240,10 +221,7 @@ export const THEMES = {
   },
 
   'aniversario': {
-    id: 'aniversario',
-    name: 'Aniversario, Amor & Amistad',
-    shortName: 'Aniversario & Amor',
-    emoji: '💖',
+    ...THEME_BASE_META['aniversario'],
     tagline: 'Pareja, Complicidad & Recuerdos Inolvidables',
     categoryBadge: '💖 Amor Incondicional',
     primaryColor: 'rose',
@@ -253,10 +231,6 @@ export const THEMES = {
     headlineHighlight: 'nuestro amor infinito',
     headlineSuffix: '',
     subtitle: 'El amor y la verdadera amistad no se miden en el tiempo, sino en las risas compartidas, los abrazos sinceros y cada recuerdo inolvidable a tu lado.',
-    defaultTo: 'Mi Amor & Compañera(o) de Vida',
-    defaultFrom: 'Quien te amará por siempre',
-    defaultDate: 'Nuestro Aniversario',
-    defaultMessage: '¡Feliz Aniversario! Gracias por cada momento, cada sonrisa cómplice y por caminar a mi lado. Contigo cada día es más bonito, más dulce y más especial. Te elijo hoy, mañana y siempre con todo mi corazón.',
     palette: {
       bgGradient: 'bg-gradient-to-b from-rose-50/80 via-red-50/40 to-amber-50/30',
       heroTagBg: 'bg-rose-100/90 border-rose-300 text-rose-900',
@@ -318,7 +292,7 @@ export const THEMES = {
 };
 
 export const THEME_KEYS = Object.keys(THEMES);
-export const DEFAULT_THEME_ID = 'flores-amarillas';
+export { DEFAULT_THEME_ID };
 
 export function getTheme(id) {
   return THEMES[id] || THEMES[DEFAULT_THEME_ID];
