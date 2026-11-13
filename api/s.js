@@ -7,6 +7,24 @@ import {
 } from './_lib/store.js';
 
 const MAX_BODY_BYTES = 16 * 1024;
+const ALLOWED_CORS_ORIGINS = new Set([
+  'https://flores.modlovelace.com',
+  'https://regalaflores.modlovelace.com',
+  'https://regala-flores-web.vercel.app',
+  'https://modlovelace.com'
+]);
+
+function applyCorsHeaders(req, res) {
+  const origin = req.headers?.origin;
+  if (!origin) return;
+  const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  if (ALLOWED_CORS_ORIGINS.has(origin) || isLocal) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+}
 
 function getOrigin(req) {
   const protoHeader = req.headers['x-forwarded-proto'];
@@ -45,6 +63,10 @@ async function readBody(req) {
 }
 
 export default async function handler(req, res) {
+  applyCorsHeaders(req, res);
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
 
   if (req.method === 'GET') {
@@ -72,7 +94,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'GET, POST');
+    res.setHeader('Allow', 'GET, POST, OPTIONS');
     return res.status(405).json({ ok: false, error: 'method_not_allowed' });
   }
 
