@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { Sparkles, Droplets } from 'lucide-react';
-import { startMovieMusic, switchMovieStageMusic } from '../utils/audioChimes';
+import { startMovieMusic, isAudioCurrentlyPlaying } from '../utils/audioChimes';
 import {
   SunflowerBouquetSVG,
   BirthdayCakeSVG,
@@ -282,11 +282,23 @@ export default function InteractiveBouquet({
     setBloomCount((prev) => prev + 1);
     playCenterpiecePulse();
 
-    // Start or advance melody for the active theme
-    startMovieMusic(nextStage, theme.id);
+    // En cada toque verificar si la música ya está iniciada: solo iniciarla si aún no suena
+    if (!isAudioCurrentlyPlaying()) {
+      startMovieMusic(nextStage, theme.id);
+    }
 
     // Disparo festivo temático confinado estrictamente al espacio de la flor / torta / trofeo / rosas
     fireThematicParticles(theme.id, nextStage);
+  };
+
+  const handleSelectStage = (targetStage) => {
+    setBloomStage(targetStage);
+    setBloomCount((c) => c + 1);
+    playCenterpiecePulse();
+    fireThematicParticles(theme.id, targetStage);
+    if (!isAudioCurrentlyPlaying()) {
+      startMovieMusic(targetStage, theme.id);
+    }
   };
 
   const currentStageInfo = theme.stageNames[bloomStage - 1] || theme.stageNames[0];
@@ -397,23 +409,11 @@ export default function InteractiveBouquet({
                 key={idx}
                 role="button"
                 tabIndex={0}
-                onClick={() => {
-                  const targetStage = idx + 1;
-                  setBloomStage(targetStage);
-                  setBloomCount((c) => c + 1);
-                  playCenterpiecePulse();
-                  fireThematicParticles(theme.id, targetStage);
-                  switchMovieStageMusic(targetStage, theme.id);
-                }}
+                onClick={() => handleSelectStage(idx + 1)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    const targetStage = idx + 1;
-                    setBloomStage(targetStage);
-                    setBloomCount((c) => c + 1);
-                    playCenterpiecePulse();
-                    fireThematicParticles(theme.id, targetStage);
-                    switchMovieStageMusic(targetStage, theme.id);
+                    handleSelectStage(idx + 1);
                   }
                 }}
                 className={`relative flex flex-col justify-between p-3.5 rounded-2xl border transition-all duration-300 text-left cursor-pointer select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${

@@ -6,6 +6,7 @@ import {
   toggleMovieMusic,
   stopMovieMusic,
   subscribeMusicState,
+  isAudioCurrentlyPlaying,
   isUserPausedMusic,
   getTrackInfo,
 } from '../utils/audioChimes';
@@ -34,7 +35,7 @@ export default function MusicPlayer({ bloomStage = 1, themeId = 'flores-amarilla
     };
 
     function handleFirstInteraction(event) {
-      if (isUserPausedMusic()) {
+      if (isAudioCurrentlyPlaying() || isUserPausedMusic()) {
         removeUnlockListeners();
         return;
       }

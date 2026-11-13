@@ -7,6 +7,7 @@ let activeMusicTimeouts = [];
 let isMusicPlaying = false;
 let currentActiveStage = 1;
 let currentActiveTheme = 'flores-amarillas';
+let activePlayingTheme = null;
 const musicListeners = new Set();
 
 let userPaused = false;
@@ -576,6 +577,7 @@ function scheduleNextLoop(delayMs) {
 function beginPlaybackLoop(onStateChange = null) {
   stopAllMusicAudio();
   isMusicPlaying = true;
+  activePlayingTheme = currentActiveTheme;
 
   const firstLoopMs = playStageMelody(currentActiveStage, currentActiveTheme);
   scheduleNextLoop(firstLoopMs);
@@ -621,9 +623,18 @@ export function attemptAutoplayMusic(stage = 1, theme = null, onStateChange = nu
 
 export function startMovieMusic(stage = 1, theme = null, onStateChange = null) {
   try {
+    const targetTheme = theme || currentActiveTheme;
+
+    // Si la música ya está iniciada para esta canción/tema, no reiniciar el audio en curso
+    if (isMusicPlaying && activePlayingTheme === targetTheme) {
+      currentActiveStage = stage;
+      notifyMusicListeners();
+      return true;
+    }
+
     userPaused = false;
     currentActiveStage = stage;
-    if (theme) currentActiveTheme = theme;
+    currentActiveTheme = targetTheme;
 
     const ctx = getAudioContext();
     if (!ctx) return false;
@@ -637,6 +648,7 @@ export function startMovieMusic(stage = 1, theme = null, onStateChange = null) {
       .resume()
       .then(() => {
         if (requestId !== startRequestId || userPaused) return;
+        if (isMusicPlaying && activePlayingTheme === currentActiveTheme) return;
         if (ctx.state === 'running') {
           beginPlaybackLoop(onStateChange);
         }
@@ -654,6 +666,7 @@ export function stopMovieMusic(onStateChange = null, { byUser = false } = {}) {
   startRequestId++;
   if (byUser) userPaused = true;
   isMusicPlaying = false;
+  activePlayingTheme = null;
   stopAllMusicAudio();
   if (onStateChange) onStateChange(false);
   notifyMusicListeners();
@@ -672,7 +685,12 @@ export function switchMovieStageMusic(nextStage, theme = null, onStateChange = n
   currentActiveStage = nextStage;
   if (theme) currentActiveTheme = theme;
   if (isMusicPlaying) {
-    startMovieMusic(nextStage, currentActiveTheme, onStateChange);
+    // Solo reiniciar/cambiar pista si cambió de tema; si ya suena este tema, continuar sin cortes
+    if (activePlayingTheme !== currentActiveTheme) {
+      startMovieMusic(nextStage, currentActiveTheme, onStateChange);
+    } else {
+      notifyMusicListeners();
+    }
   } else {
     notifyMusicListeners();
   }
