@@ -36,6 +36,7 @@
 .washi-tape {
   background: rgba(254, 240, 138, 0.65);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
   position: relative;
 }
@@ -43,12 +44,14 @@
 .washi-tape-pink {
   background: rgba(252, 231, 243, 0.7);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
 }
 
 .washi-tape-sage {
   background: rgba(220, 252, 231, 0.7);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  -webkit-backdrop-filter: blur(1px);
   backdrop-filter: blur(1px);
 }
 
@@ -203,29 +206,131 @@
   animation: sunburstSpin 25s linear infinite;
 }
 
-/* 🌸 Botanical Natural Bloom Animation (Fluido, orgánico y realista) */
+/* 🌸 Centerpiece & Cake Celebration Pulse (GPU-only para fluidez 60fps en Safari iOS/macOS) */
 @keyframes botanicalBloom {
   0% {
-    transform: scale(0.985) translateY(1px);
-    filter: brightness(1);
+    -webkit-transform: scale3d(0.97, 0.97, 1) translate3d(0, 2px, 0);
+    transform: scale3d(0.97, 0.97, 1) translate3d(0, 2px, 0);
   }
-  35% {
-    transform: scale(1.03) translateY(-6px);
-    filter: brightness(1.08) drop-shadow(0 0 25px rgba(250, 204, 21, 0.45));
+  30% {
+    -webkit-transform: scale3d(1.045, 1.045, 1) translate3d(0, -8px, 0);
+    transform: scale3d(1.045, 1.045, 1) translate3d(0, -8px, 0);
   }
-  70% {
-    transform: scale(1.01) translateY(-2px);
-    filter: brightness(1.04) drop-shadow(0 0 15px rgba(250, 204, 21, 0.25));
+  65% {
+    -webkit-transform: scale3d(0.992, 0.992, 1) translate3d(0, 1px, 0);
+    transform: scale3d(0.992, 0.992, 1) translate3d(0, 1px, 0);
   }
   100% {
-    transform: scale(1) translateY(0);
-    filter: brightness(1);
+    -webkit-transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+    transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
   }
 }
 
 .animate-botanical-bloom {
-  transform-origin: 50% 92%;
-  animation: botanicalBloom 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  -webkit-transform-origin: 50% 88%;
+  transform-origin: 50% 88%;
+  will-change: transform;
+  -webkit-animation: botanicalBloom 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: botanicalBloom 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* 🎂 Safari-safe SVG animations (separadas de transform="translate(...)" usando transform-box: fill-box) */
+@keyframes cakeFlameFlicker {
+  0%, 100% {
+    -webkit-transform: scale3d(1, 1, 1) rotate(-2deg);
+    transform: scale3d(1, 1, 1) rotate(-2deg);
+    opacity: 0.96;
+  }
+  25% {
+    -webkit-transform: scale3d(0.93, 1.09, 1) rotate(2.5deg);
+    transform: scale3d(0.93, 1.09, 1) rotate(2.5deg);
+    opacity: 1;
+  }
+  50% {
+    -webkit-transform: scale3d(1.05, 0.95, 1) rotate(-1.5deg);
+    transform: scale3d(1.05, 0.95, 1) rotate(-1.5deg);
+    opacity: 0.9;
+  }
+  75% {
+    -webkit-transform: scale3d(0.96, 1.06, 1) rotate(3deg);
+    transform: scale3d(0.96, 1.06, 1) rotate(3deg);
+    opacity: 1;
+  }
+}
+
+.cake-flame-flicker {
+  transform-box: fill-box;
+  -webkit-transform-origin: 50% 90%;
+  transform-origin: 50% 90%;
+  -webkit-animation: cakeFlameFlicker 0.95s ease-in-out infinite;
+  animation: cakeFlameFlicker 0.95s ease-in-out infinite;
+}
+
+@keyframes cakeHaloPulse {
+  0%, 100% {
+    -webkit-transform: scale3d(0.92, 0.92, 1);
+    transform: scale3d(0.92, 0.92, 1);
+    opacity: 0.45;
+  }
+  50% {
+    -webkit-transform: scale3d(1.16, 1.16, 1);
+    transform: scale3d(1.16, 1.16, 1);
+    opacity: 0.85;
+  }
+}
+
+.cake-halo-pulse {
+  transform-box: fill-box;
+  -webkit-transform-origin: center center;
+  transform-origin: center center;
+  -webkit-animation: cakeHaloPulse 2s ease-in-out infinite;
+  animation: cakeHaloPulse 2s ease-in-out infinite;
+}
+
+@keyframes cakeSparkleFloat {
+  0%, 100% {
+    -webkit-transform: translate3d(0, 0, 0) scale3d(0.88, 0.88, 1) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale3d(0.88, 0.88, 1) rotate(0deg);
+    opacity: 0.72;
+  }
+  50% {
+    -webkit-transform: translate3d(0, -10px, 0) scale3d(1.15, 1.15, 1) rotate(16deg);
+    transform: translate3d(0, -10px, 0) scale3d(1.15, 1.15, 1) rotate(16deg);
+    opacity: 1;
+  }
+}
+
+.cake-sparkle-float {
+  transform-box: fill-box;
+  -webkit-transform-origin: center center;
+  transform-origin: center center;
+  -webkit-animation: cakeSparkleFloat 2.1s ease-in-out infinite;
+  animation: cakeSparkleFloat 2.1s ease-in-out infinite;
+}
+
+@keyframes svgFloatBob {
+  0%, 100% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    -webkit-transform: translate3d(0, -8px, 0);
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+.svg-float-bob {
+  transform-box: fill-box;
+  -webkit-transform-origin: center center;
+  transform-origin: center center;
+  -webkit-animation: svgFloatBob 1.9s ease-in-out infinite;
+  animation: svgFloatBob 1.9s ease-in-out infinite;
+}
+
+.safari-layer-clip {
+  isolation: isolate;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 /* 🌿 Ambient Gentle Breeze Sway for Lush Bouquet */

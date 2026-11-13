@@ -104,12 +104,14 @@ export function SunflowerBouquetSVG({ bloomStage = 1 }) {
         <circle cx="-5" cy="-5" r="4" fill="#CA8A04" opacity="0.7" />
       </g>
 
-      {/* Stage 3+: Fluttering Golden Butterfly */}
+      {/* Stage 3+: Fluttering Golden Butterfly (contenedor posicionador separado del animado para Safari) */}
       {bloomStage >= 3 && (
-        <g transform="translate(370, 150) rotate(15)" className="animate-bounce">
-          <ellipse cx="-10" cy="-8" rx="10" ry="16" fill="#FEF08A" stroke="#CA8A04" strokeWidth="1" transform="rotate(-30 -10 -8)" />
-          <ellipse cx="10" cy="-8" rx="10" ry="16" fill="#FEF08A" stroke="#CA8A04" strokeWidth="1" transform="rotate(30 10 -8)" />
-          <ellipse cx="0" cy="0" rx="3" ry="12" fill="#78350F" />
+        <g transform="translate(370, 150) rotate(15)">
+          <g className="svg-float-bob">
+            <ellipse cx="-10" cy="-8" rx="10" ry="16" fill="#FEF08A" stroke="#CA8A04" strokeWidth="1" transform="rotate(-30 -10 -8)" />
+            <ellipse cx="10" cy="-8" rx="10" ry="16" fill="#FEF08A" stroke="#CA8A04" strokeWidth="1" transform="rotate(30 10 -8)" />
+            <ellipse cx="0" cy="0" rx="3" ry="12" fill="#78350F" />
+          </g>
         </g>
       )}
 
@@ -129,30 +131,54 @@ export function SunflowerBouquetSVG({ bloomStage = 1 }) {
  * 🎂 Feliz Cumpleaños Aesthetic Cake SVG Centerpiece
  */
 export function BirthdayCakeSVG({ bloomStage = 1 }) {
-  const isCandleLit = bloomStage >= 2;
   const isSparklers = bloomStage >= 3;
+  const isGrandFinale = bloomStage >= 4;
+
+  const baseSparkles = [
+    { x: 120, y: 225, s: 14, color: '#FACC15' },
+    { x: 400, y: 225, s: 14, color: '#F472B6' },
+    { x: 158, y: 152, s: 16, color: '#38BDF8' },
+    { x: 362, y: 152, s: 16, color: '#FBBF24' },
+  ];
+
+  const finaleSparkles = [
+    { x: 260, y: 112, s: 19, color: '#FACC15' },
+    { x: 96, y: 300, s: 12, color: '#A78BFA' },
+    { x: 424, y: 300, s: 12, color: '#FB7185' },
+  ];
 
   return (
     <svg
       viewBox="0 0 520 620"
-      className="w-full h-full drop-shadow-xl select-none transition-all duration-700 overflow-visible"
+      className="w-full h-full select-none overflow-visible"
     >
       <defs>
         <radialGradient id="cakeGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#FBCFE8" stopOpacity="0.8" />
-          <stop offset="60%" stopColor="#F472B6" stopOpacity="0.3" />
+          <stop offset="0%" stopColor="#FBCFE8" stopOpacity="0.85" />
+          <stop offset="60%" stopColor="#F472B6" stopOpacity="0.32" />
           <stop offset="100%" stopColor="#EC4899" stopOpacity="0" />
         </radialGradient>
-        <radialGradient id="candleFlame" cx="50%" cy="30%" r="50%">
+        <radialGradient id="candleHalo" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#FDE047" stopOpacity="0.7" />
+          <stop offset="55%" stopColor="#F97316" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#F97316" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="candleFlame" cx="50%" cy="35%" r="55%">
           <stop offset="0%" stopColor="#FFFFFF" />
           <stop offset="40%" stopColor="#FDE047" />
           <stop offset="80%" stopColor="#F97316" />
-          <stop offset="100%" stopColor="#EF4444" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#EF4444" stopOpacity="0.85" />
         </radialGradient>
       </defs>
 
       {/* Ambient Birthday Glow */}
-      <circle cx="260" cy="280" r="190" fill="url(#cakeGlow)" className="animate-pulse" />
+      <circle
+        cx="260"
+        cy="280"
+        r={isGrandFinale ? 210 : isSparklers ? 198 : 185}
+        fill="url(#cakeGlow)"
+        className="cake-halo-pulse"
+      />
 
       {/* Decorative Plate Stand */}
       <ellipse cx="260" cy="510" rx="190" ry="24" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="3" />
@@ -203,11 +229,30 @@ export function BirthdayCakeSVG({ bloomStage = 1 }) {
             {/* Wick */}
             <line x1="0" y1="10" x2="0" y2="3" stroke="#451A03" strokeWidth="1.5" />
 
-            {/* Flame (se enciende progresivamente por cada fase) */}
+            {/* Flame + Warm Glow (sin atributo transform en nodo animado para compatibilidad Safari) */}
             {isThisCandleLit && (
-              <g className="animate-pulse" style={{ animationDuration: `${0.7 + idx * 0.15}s` }}>
-                <ellipse cx="0" cy="-8" rx="6" ry="12" fill="url(#candleFlame)" />
-                <circle cx="0" cy="-5" r="3" fill="#FFFFFF" />
+              <g>
+                <circle
+                  cx="0"
+                  cy="-10"
+                  r="16"
+                  fill="url(#candleHalo)"
+                  className="cake-halo-pulse"
+                  style={{ animationDelay: `${idx * 0.22}s` }}
+                />
+                <g
+                  className="cake-flame-flicker"
+                  style={{
+                    animationDelay: `${idx * 0.16}s`,
+                    animationDuration: `${0.82 + idx * 0.12}s`,
+                  }}
+                >
+                  <path
+                    d="M0 -21 C5 -14 7 -7 5 -2 C3.5 1 2 2.5 0 2.5 C-2 2.5 -3.5 1 -5 -2 C-7 -7 -5 -14 0 -21 Z"
+                    fill="url(#candleFlame)"
+                  />
+                  <ellipse cx="0" cy="-5" rx="2.6" ry="5" fill="#FFFBEB" />
+                </g>
               </g>
             )}
 
@@ -220,21 +265,24 @@ export function BirthdayCakeSVG({ bloomStage = 1 }) {
         );
       })}
 
-      {/* Stage 3+: Sparklers & Fireworks */}
+      {/* Stage 3+: Sparklers & Fireworks (Safari-safe nested translate + animated child) */}
       {isSparklers && (
         <g>
-          {/* Sparkler stars around cake */}
-          {[
-            { x: 120, y: 220, s: 14, color: '#FACC15' },
-            { x: 400, y: 220, s: 14, color: '#F472B6' },
-            { x: 160, y: 150, s: 16, color: '#38BDF8' },
-            { x: 360, y: 150, s: 16, color: '#FBBF24' },
-          ].map((st, i) => (
-            <g key={i} transform={`translate(${st.x}, ${st.y})`} className="animate-bounce">
-              <path
-                d={`M0 -${st.s} Q0 0 ${st.s} 0 Q0 0 0 ${st.s} Q0 0 -${st.s} 0 Q0 0 0 -${st.s} Z`}
-                fill={st.color}
-              />
+          {[...baseSparkles, ...(isGrandFinale ? finaleSparkles : [])].map((st, i) => (
+            <g key={i} transform={`translate(${st.x}, ${st.y})`}>
+              <g
+                className="cake-sparkle-float"
+                style={{
+                  animationDelay: `${i * 0.24}s`,
+                  animationDuration: `${1.9 + (i % 3) * 0.25}s`,
+                }}
+              >
+                <path
+                  d={`M0 -${st.s} Q0 0 ${st.s} 0 Q0 0 0 ${st.s} Q0 0 -${st.s} 0 Q0 0 0 -${st.s} Z`}
+                  fill={st.color}
+                />
+                <circle cx="0" cy="0" r={st.s * 0.22} fill="#FFFFFF" opacity="0.9" />
+              </g>
             </g>
           ))}
         </g>
@@ -350,11 +398,13 @@ export function TrophyLaurelSVG({ bloomStage = 1 }) {
             { x: 330, y: 120, s: 15 },
             { x: 260, y: 90, s: 20 },
           ].map((st, i) => (
-            <g key={i} transform={`translate(${st.x}, ${st.y})`} className="animate-pulse">
-              <path
-                d={`M0 -${st.s} Q0 0 ${st.s} 0 Q0 0 0 ${st.s} Q0 0 -${st.s} 0 Q0 0 0 -${st.s} Z`}
-                fill="#FBBF24"
-              />
+            <g key={i} transform={`translate(${st.x}, ${st.y})`}>
+              <g className="cake-sparkle-float" style={{ animationDelay: `${i * 0.25}s` }}>
+                <path
+                  d={`M0 -${st.s} Q0 0 ${st.s} 0 Q0 0 0 ${st.s} Q0 0 -${st.s} 0 Q0 0 0 -${st.s} Z`}
+                  fill="#FBBF24"
+                />
+              </g>
             </g>
           ))}
         </g>
@@ -428,16 +478,18 @@ export function RosesBouquetSVG({ bloomStage = 1 }) {
         <circle cx="0" cy="0" r="6" fill="#FFF1F2" />
       </g>
 
-      {/* Floating Golden Heart / Butterflies */}
+      {/* Floating Golden Heart / Butterflies (Safari-safe) */}
       {bloomStage >= 2 && (
-        <g transform="translate(360, 160)" className="animate-bounce">
-          <path
-            d="M0 6 Q-12 -10 0 -18 Q12 -10 0 6 Z"
-            fill="#FACC15"
-            stroke="#CA8A04"
-            strokeWidth="1.5"
-            transform="scale(1.5)"
-          />
+        <g transform="translate(360, 160)">
+          <g className="svg-float-bob">
+            <path
+              d="M0 6 Q-12 -10 0 -18 Q12 -10 0 6 Z"
+              fill="#FACC15"
+              stroke="#CA8A04"
+              strokeWidth="1.5"
+              transform="scale(1.5)"
+            />
+          </g>
         </g>
       )}
 

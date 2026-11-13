@@ -67,8 +67,8 @@ export function stopAllMusicAudio() {
     try {
       const now = audioCtx.currentTime;
       musicMasterGain.gain.cancelScheduledValues(now);
-      musicMasterGain.gain.setValueAtTime(0, now);
-      musicMasterGain.gain.setValueAtTime(1.0, now + 0.02);
+      musicMasterGain.gain.setValueAtTime(0.0001, now);
+      musicMasterGain.gain.linearRampToValueAtTime(1.0, now + 0.03);
     } catch (e) {}
   }
 }
@@ -283,142 +283,302 @@ function notifyMusicListeners() {
 }
 
 /**
- * Render one iteration of the selected melody according to theme & stage
+ * Return the full multi-phrase composition (melody + harmony accompaniment + exact loop duration)
+ * so every theme plays a complete song before looping seamlessly.
+ */
+export function getMelodySequence(stage = 1, theme = 'flores-amarillas') {
+  // 1. CUMPLEAÑOS FELIZ COMPLETA (Sol mayor, 4 frases completas con clímax D5 y cierre G4)
+  if (theme === 'cumpleanos') {
+    return {
+      loopMs: 17400,
+      accompaniment: [
+        // Frase 1 (G -> D7)
+        { f: 196.00, t: 0.72, d: 1.9, v: 0.030, type: 'triangle' }, // G3
+        { f: 246.94, t: 0.72, d: 1.4, v: 0.018, type: 'sine' },     // B3
+        { f: 146.83, t: 2.70, d: 1.3, v: 0.030, type: 'triangle' }, // D3
+        { f: 220.00, t: 2.70, d: 1.1, v: 0.018, type: 'sine' },     // A3
+        // Frase 2 (D7 -> G)
+        { f: 146.83, t: 4.72, d: 1.9, v: 0.030, type: 'triangle' }, // D3
+        { f: 261.63, t: 4.72, d: 1.4, v: 0.016, type: 'sine' },     // C4
+        { f: 196.00, t: 6.70, d: 1.3, v: 0.030, type: 'triangle' }, // G3
+        { f: 246.94, t: 6.70, d: 1.1, v: 0.018, type: 'sine' },     // B3
+        // Frase 3 (G -> C)
+        { f: 196.00, t: 8.72, d: 2.3, v: 0.032, type: 'triangle' }, // G3
+        { f: 293.66, t: 8.72, d: 1.7, v: 0.018, type: 'sine' },     // D4
+        { f: 130.81, t: 11.34, d: 1.3, v: 0.032, type: 'triangle' }, // C3
+        { f: 261.63, t: 11.34, d: 1.1, v: 0.020, type: 'sine' },     // C4
+        // Frase 4 (C -> G/D -> D7 -> G)
+        { f: 130.81, t: 13.24, d: 1.3, v: 0.030, type: 'triangle' }, // C3
+        { f: 146.83, t: 14.60, d: 0.8, v: 0.030, type: 'triangle' }, // D3
+        { f: 196.00, t: 15.30, d: 1.7, v: 0.034, type: 'triangle' }, // G3
+        { f: 246.94, t: 15.30, d: 1.5, v: 0.020, type: 'sine' },     // B3
+      ],
+      notes: [
+        // Frase 1: "Cumpleaños feliz"
+        { f: 293.66, t: 0.00, d: 0.40, v: 0.065 }, // D4
+        { f: 293.66, t: 0.42, d: 0.28, v: 0.060 }, // D4
+        { f: 329.63, t: 0.72, d: 0.62, v: 0.072 }, // E4
+        { f: 293.66, t: 1.38, d: 0.62, v: 0.070 }, // D4
+        { f: 392.00, t: 2.04, d: 0.64, v: 0.078 }, // G4
+        { f: 369.99, t: 2.70, d: 1.15, v: 0.075 }, // F#4
+        // Frase 2: "te deseamos a ti"
+        { f: 293.66, t: 4.00, d: 0.40, v: 0.065 }, // D4
+        { f: 293.66, t: 4.42, d: 0.28, v: 0.060 }, // D4
+        { f: 329.63, t: 4.72, d: 0.62, v: 0.072 }, // E4
+        { f: 293.66, t: 5.38, d: 0.62, v: 0.070 }, // D4
+        { f: 440.00, t: 6.04, d: 0.64, v: 0.080 }, // A4
+        { f: 392.00, t: 6.70, d: 1.15, v: 0.076 }, // G4
+        // Frase 3: "cumpleaños querida..." (clímax agudo D5)
+        { f: 293.66, t: 8.00, d: 0.40, v: 0.065 }, // D4
+        { f: 293.66, t: 8.42, d: 0.28, v: 0.062 }, // D4
+        { f: 587.33, t: 8.72, d: 0.68, v: 0.088 }, // D5
+        { f: 493.88, t: 9.42, d: 0.62, v: 0.078 }, // B4
+        { f: 392.00, t: 10.08, d: 0.60, v: 0.074 }, // G4
+        { f: 369.99, t: 10.72, d: 0.58, v: 0.070 }, // F#4
+        { f: 329.63, t: 11.34, d: 1.05, v: 0.075 }, // E4
+        // Frase 4: "que los cumplas feliz!"
+        { f: 523.25, t: 12.50, d: 0.42, v: 0.078 }, // C5
+        { f: 523.25, t: 12.94, d: 0.28, v: 0.072 }, // C5
+        { f: 493.88, t: 13.24, d: 0.64, v: 0.080 }, // B4
+        { f: 392.00, t: 13.92, d: 0.64, v: 0.076 }, // G4
+        { f: 440.00, t: 14.60, d: 0.66, v: 0.082 }, // A4
+        { f: 392.00, t: 15.30, d: 1.65, v: 0.086 }, // G4
+      ],
+    };
+  }
+
+  // 2. LOGRO PROFESIONAL (Fanfarria del Triunfo completa A + B, Do mayor)
+  if (theme === 'logro-profesional') {
+    return {
+      loopMs: 14400,
+      accompaniment: [
+        { f: 130.81, t: 0.0, d: 3.2, v: 0.036, type: 'triangle' },  // C3
+        { f: 196.00, t: 3.4, d: 3.0, v: 0.034, type: 'triangle' },  // G3
+        { f: 174.61, t: 6.8, d: 3.0, v: 0.034, type: 'triangle' },  // F3
+        { f: 196.00, t: 10.0, d: 1.8, v: 0.034, type: 'triangle' }, // G3
+        { f: 130.81, t: 12.0, d: 2.0, v: 0.038, type: 'triangle' }, // C3
+      ],
+      notes: [
+        // Frase A
+        { f: 261.63, t: 0.0, d: 0.65, v: 0.060 },
+        { f: 329.63, t: 0.65, d: 0.65, v: 0.064 },
+        { f: 392.00, t: 1.30, d: 0.80, v: 0.070 },
+        { f: 523.25, t: 2.10, d: 1.15, v: 0.080 },
+        { f: 493.88, t: 3.35, d: 0.60, v: 0.066 },
+        { f: 523.25, t: 4.00, d: 0.60, v: 0.070 },
+        { f: 587.33, t: 4.65, d: 0.70, v: 0.074 },
+        { f: 659.25, t: 5.40, d: 1.25, v: 0.082 },
+        // Frase B (Clímax victorioso y cierre)
+        { f: 783.99, t: 6.80, d: 0.70, v: 0.080 }, // G5
+        { f: 659.25, t: 7.50, d: 0.65, v: 0.072 }, // E5
+        { f: 698.46, t: 8.20, d: 0.65, v: 0.074 }, // F5
+        { f: 587.33, t: 8.90, d: 0.65, v: 0.070 }, // D5
+        { f: 659.25, t: 9.60, d: 0.70, v: 0.074 }, // E5
+        { f: 587.33, t: 10.35, d: 0.65, v: 0.070 }, // D5
+        { f: 493.88, t: 11.05, d: 0.75, v: 0.072 }, // B4
+        { f: 523.25, t: 11.90, d: 1.90, v: 0.088 }, // C5 cierre
+      ],
+    };
+  }
+
+  // 3. ANIVERSARIO & AMOR (Balada romántica completa A + B)
+  if (theme === 'aniversario') {
+    return {
+      loopMs: 15200,
+      accompaniment: [
+        { f: 130.81, t: 0.0, d: 3.4, v: 0.032, type: 'sine' },  // C3
+        { f: 220.00, t: 3.6, d: 3.0, v: 0.030, type: 'sine' },  // A3
+        { f: 174.61, t: 6.9, d: 3.2, v: 0.032, type: 'sine' },  // F3
+        { f: 196.00, t: 10.4, d: 2.2, v: 0.032, type: 'sine' }, // G3
+        { f: 130.81, t: 12.8, d: 2.2, v: 0.034, type: 'sine' }, // C3
+      ],
+      notes: [
+        // Frase A
+        { f: 329.63, t: 0.0, d: 0.85, v: 0.060 },
+        { f: 392.00, t: 0.75, d: 0.80, v: 0.064 },
+        { f: 440.00, t: 1.50, d: 1.00, v: 0.072 },
+        { f: 392.00, t: 2.45, d: 0.80, v: 0.064 },
+        { f: 329.63, t: 3.30, d: 0.85, v: 0.060 },
+        { f: 293.66, t: 4.15, d: 0.80, v: 0.056 },
+        { f: 261.63, t: 4.95, d: 1.45, v: 0.068 },
+        // Frase B (Respuesta emotiva)
+        { f: 440.00, t: 6.80, d: 0.75, v: 0.068 }, // A4
+        { f: 523.25, t: 7.55, d: 0.85, v: 0.076 }, // C5
+        { f: 493.88, t: 8.40, d: 0.80, v: 0.072 }, // B4
+        { f: 392.00, t: 9.20, d: 0.85, v: 0.066 }, // G4
+        { f: 440.00, t: 10.10, d: 0.75, v: 0.070 }, // A4
+        { f: 349.23, t: 10.85, d: 0.75, v: 0.064 }, // F4
+        { f: 329.63, t: 11.60, d: 0.65, v: 0.062 }, // E4
+        { f: 293.66, t: 12.25, d: 0.65, v: 0.060 }, // D4
+        { f: 261.63, t: 12.90, d: 1.85, v: 0.076 }, // C4 cierre dulce
+      ],
+    };
+  }
+
+  // 4. FLORES AMARILLAS & PRIMAVERA (Vals completo A + B por cada etapa 1..4)
+  if (stage === 1) {
+    return {
+      loopMs: 12800,
+      accompaniment: [
+        { f: 146.83, t: 0.0, d: 2.8, v: 0.030, type: 'triangle' },
+        { f: 164.81, t: 3.0, d: 2.8, v: 0.028, type: 'triangle' },
+        { f: 196.00, t: 6.2, d: 2.8, v: 0.030, type: 'triangle' },
+        { f: 146.83, t: 9.2, d: 3.0, v: 0.032, type: 'triangle' },
+      ],
+      notes: [
+        { f: 293.66, t: 0.0, d: 0.8, v: 0.058 },
+        { f: 369.99, t: 0.6, d: 0.8, v: 0.060 },
+        { f: 440.00, t: 1.2, d: 1.0, v: 0.068 },
+        { f: 493.88, t: 1.9, d: 0.8, v: 0.062 },
+        { f: 440.00, t: 2.6, d: 0.9, v: 0.064 },
+        { f: 369.99, t: 3.4, d: 0.8, v: 0.056 },
+        { f: 329.63, t: 4.1, d: 0.8, v: 0.056 },
+        { f: 293.66, t: 4.8, d: 1.2, v: 0.066 },
+        // Parte B
+        { f: 369.99, t: 6.2, d: 0.7, v: 0.060 },
+        { f: 440.00, t: 6.9, d: 0.7, v: 0.065 },
+        { f: 587.33, t: 7.6, d: 1.0, v: 0.075 },
+        { f: 554.37, t: 8.5, d: 0.7, v: 0.068 },
+        { f: 493.88, t: 9.2, d: 0.7, v: 0.065 },
+        { f: 440.00, t: 9.9, d: 0.8, v: 0.066 },
+        { f: 369.99, t: 10.6, d: 0.7, v: 0.058 },
+        { f: 293.66, t: 11.3, d: 1.3, v: 0.070 },
+      ],
+    };
+  }
+
+  if (stage === 2) {
+    return {
+      loopMs: 13000,
+      accompaniment: [
+        { f: 196.00, t: 0.0, d: 3.0, v: 0.030, type: 'triangle' },
+        { f: 146.83, t: 3.2, d: 2.8, v: 0.028, type: 'triangle' },
+        { f: 164.81, t: 6.2, d: 3.0, v: 0.030, type: 'triangle' },
+        { f: 196.00, t: 9.4, d: 3.0, v: 0.032, type: 'triangle' },
+      ],
+      notes: [
+        { f: 246.94, t: 0.0, d: 0.7, v: 0.056 },
+        { f: 293.66, t: 0.55, d: 0.7, v: 0.058 },
+        { f: 369.99, t: 1.10, d: 0.8, v: 0.064 },
+        { f: 440.00, t: 1.75, d: 1.1, v: 0.072 },
+        { f: 392.00, t: 2.75, d: 0.8, v: 0.064 },
+        { f: 329.63, t: 3.50, d: 0.85, v: 0.062 },
+        { f: 293.66, t: 4.30, d: 1.3, v: 0.070 },
+        // Parte B
+        { f: 392.00, t: 6.00, d: 0.7, v: 0.064 },
+        { f: 493.88, t: 6.70, d: 0.75, v: 0.070 },
+        { f: 587.33, t: 7.45, d: 0.95, v: 0.078 },
+        { f: 659.25, t: 8.35, d: 0.85, v: 0.076 },
+        { f: 587.33, t: 9.20, d: 0.75, v: 0.070 },
+        { f: 493.88, t: 9.95, d: 0.75, v: 0.066 },
+        { f: 440.00, t: 10.70, d: 0.70, v: 0.064 },
+        { f: 392.00, t: 11.40, d: 1.40, v: 0.074 },
+      ],
+    };
+  }
+
+  if (stage === 3) {
+    return {
+      loopMs: 12600,
+      accompaniment: [
+        { f: 164.81, t: 0.0, d: 3.0, v: 0.030, type: 'triangle' },
+        { f: 130.81, t: 3.1, d: 2.8, v: 0.028, type: 'triangle' },
+        { f: 196.00, t: 6.0, d: 3.0, v: 0.030, type: 'triangle' },
+        { f: 164.81, t: 9.2, d: 3.0, v: 0.032, type: 'triangle' },
+      ],
+      notes: [
+        { f: 329.63, t: 0.0, d: 0.7, v: 0.056 },
+        { f: 392.00, t: 0.6, d: 0.8, v: 0.064 },
+        { f: 493.88, t: 1.3, d: 0.9, v: 0.068 },
+        { f: 440.00, t: 2.1, d: 0.75, v: 0.064 },
+        { f: 392.00, t: 2.8, d: 0.8, v: 0.064 },
+        { f: 329.63, t: 3.6, d: 1.25, v: 0.070 },
+        // Parte B
+        { f: 392.00, t: 5.5, d: 0.7, v: 0.062 },
+        { f: 493.88, t: 6.2, d: 0.75, v: 0.068 },
+        { f: 587.33, t: 6.9, d: 0.85, v: 0.074 },
+        { f: 523.25, t: 7.75, d: 0.75, v: 0.070 },
+        { f: 493.88, t: 8.5, d: 0.75, v: 0.068 },
+        { f: 440.00, t: 9.25, d: 0.75, v: 0.064 },
+        { f: 392.00, t: 10.0, d: 0.75, v: 0.064 },
+        { f: 329.63, t: 10.75, d: 1.5, v: 0.072 },
+      ],
+    };
+  }
+
+  return {
+    loopMs: 13400,
+    accompaniment: [
+      { f: 146.83, t: 0.0, d: 3.2, v: 0.032, type: 'triangle' },
+      { f: 196.00, t: 3.4, d: 2.8, v: 0.030, type: 'triangle' },
+      { f: 220.00, t: 6.4, d: 3.2, v: 0.032, type: 'triangle' },
+      { f: 146.83, t: 9.8, d: 3.2, v: 0.035, type: 'triangle' },
+    ],
+    notes: [
+      { f: 293.66, t: 0.0, d: 0.7, v: 0.056 },
+      { f: 369.99, t: 0.55, d: 0.7, v: 0.060 },
+      { f: 440.00, t: 1.15, d: 0.8, v: 0.066 },
+      { f: 587.33, t: 1.85, d: 1.1, v: 0.078 },
+      { f: 493.88, t: 2.85, d: 0.7, v: 0.064 },
+      { f: 440.00, t: 3.55, d: 0.75, v: 0.068 },
+      { f: 369.99, t: 4.25, d: 0.7, v: 0.060 },
+      { f: 293.66, t: 4.95, d: 1.3, v: 0.070 },
+      // Parte B triunfal
+      { f: 587.33, t: 6.4, d: 0.7, v: 0.076 },
+      { f: 554.37, t: 7.1, d: 0.65, v: 0.070 },
+      { f: 493.88, t: 7.75, d: 0.75, v: 0.068 },
+      { f: 440.00, t: 8.5, d: 0.75, v: 0.068 },
+      { f: 493.88, t: 9.25, d: 0.7, v: 0.070 },
+      { f: 587.33, t: 9.95, d: 0.7, v: 0.076 },
+      { f: 659.25, t: 10.65, d: 0.75, v: 0.080 },
+      { f: 739.99, t: 11.4, d: 0.65, v: 0.078 },
+      { f: 587.33, t: 12.05, d: 1.25, v: 0.082 },
+    ],
+  };
+}
+
+/**
+ * Render one complete iteration of the selected melody according to theme & stage
  */
 function playStageMelody(stage, theme = 'flores-amarillas') {
-  if (!isMusicPlaying) return;
+  if (!isMusicPlaying) return 14000;
   const ctx = getAudioContext();
-  if (!ctx) return;
+  if (!ctx) return 14000;
 
-  const now = ctx.currentTime;
+  // Desfase breve tras el ramp del masterGain para evitar micro-clipping en Safari WebKit
+  const now = ctx.currentTime + 0.035;
+  const sequence = getMelodySequence(stage, theme);
 
-  // 1. CUMPLEAÑOS
-  if (theme === 'cumpleanos') {
-    // Happy Birthday in G Major / D
-    const birthdayNotes = [
-      { f: 293.66, t: 0.0, d: 0.45, v: 0.06 }, // D4
-      { f: 293.66, t: 0.5, d: 0.35, v: 0.06 }, // D4
-      { f: 329.63, t: 0.9, d: 0.70, v: 0.07 }, // E4
-      { f: 293.66, t: 1.7, d: 0.70, v: 0.07 }, // D4
-      { f: 392.00, t: 2.5, d: 0.80, v: 0.08 }, // G4
-      { f: 369.99, t: 3.4, d: 1.30, v: 0.07 }, // F#4
-      // Second phrase
-      { f: 293.66, t: 4.8, d: 0.45, v: 0.06 }, // D4
-      { f: 293.66, t: 5.3, d: 0.35, v: 0.06 }, // D4
-      { f: 329.63, t: 5.7, d: 0.70, v: 0.07 }, // E4
-      { f: 293.66, t: 6.5, d: 0.70, v: 0.07 }, // D4
-      { f: 440.00, t: 7.3, d: 0.80, v: 0.08 }, // A4
-      { f: 392.00, t: 8.2, d: 1.50, v: 0.08 }  // G4
-    ];
-    playAcousticNote(ctx, 196.00, now, 8.5, 0.03, 'triangle'); // Bass G
-    birthdayNotes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
-    return;
-  }
+  sequence.accompaniment.forEach((bass) => {
+    playAcousticNote(ctx, bass.f, now + bass.t, bass.d, bass.v, bass.type || 'triangle');
+  });
+  sequence.notes.forEach((n) => {
+    playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine');
+  });
 
-  // 2. LOGRO PROFESIONAL
-  if (theme === 'logro-profesional') {
-    // Triumphant, inspiring ascending melody (Victory & Pride)
-    const successNotes = [
-      { f: 261.63, t: 0.0, d: 0.8, v: 0.06 }, // C4
-      { f: 329.63, t: 0.7, d: 0.8, v: 0.06 }, // E4
-      { f: 392.00, t: 1.4, d: 0.9, v: 0.07 }, // G4
-      { f: 523.25, t: 2.2, d: 1.2, v: 0.08 }, // C5
-      { f: 493.88, t: 3.4, d: 0.6, v: 0.06 }, // B4
-      { f: 523.25, t: 4.1, d: 0.6, v: 0.07 }, // C5
-      { f: 587.33, t: 4.8, d: 0.7, v: 0.07 }, // D5
-      { f: 659.25, t: 5.6, d: 1.6, v: 0.09 }  // E5
-    ];
-    playAcousticNote(ctx, 130.81, now, 6.5, 0.04, 'triangle'); // Bass C
-    successNotes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
-    return;
-  }
-
-  // 3. ANIVERSARIO & AMOR
-  if (theme === 'aniversario') {
-    // Romantic warm love chords and gentle acoustic melody
-    const loveNotes = [
-      { f: 329.63, t: 0.0, d: 0.9, v: 0.06 }, // E4
-      { f: 392.00, t: 0.7, d: 0.8, v: 0.06 }, // G4
-      { f: 440.00, t: 1.4, d: 1.0, v: 0.07 }, // A4
-      { f: 392.00, t: 2.3, d: 0.8, v: 0.06 }, // G4
-      { f: 329.63, t: 3.0, d: 0.9, v: 0.06 }, // E4
-      { f: 293.66, t: 3.8, d: 0.8, v: 0.05 }, // D4
-      { f: 261.63, t: 4.5, d: 1.8, v: 0.07 }  // C4
-    ];
-    playAcousticNote(ctx, 130.81, now, 6.0, 0.035, 'sine'); // Soft warm base
-    loveNotes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
-    return;
-  }
-
-  // 4. FLORES AMARILLAS & PRIMAVERA (Original Vals)
-  if (stage === 1) {
-    const notes = [
-      { f: 293.66, t: 0.0, d: 0.9, v: 0.055 },
-      { f: 369.99, t: 0.6, d: 0.8, v: 0.055 },
-      { f: 440.00, t: 1.2, d: 1.1, v: 0.065 },
-      { f: 493.88, t: 1.8, d: 0.8, v: 0.055 },
-      { f: 440.00, t: 2.3, d: 1.0, v: 0.060 },
-      { f: 369.99, t: 3.0, d: 0.9, v: 0.050 },
-      { f: 329.63, t: 3.6, d: 0.8, v: 0.050 },
-      { f: 293.66, t: 4.2, d: 1.4, v: 0.065 },
-    ];
-    playAcousticNote(ctx, 146.83, now, 4.5, 0.03, 'triangle');
-    notes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
-  } else if (stage === 2) {
-    const notes = [
-      { f: 246.94, t: 0.0, d: 0.7, v: 0.05 },
-      { f: 293.66, t: 0.5, d: 0.7, v: 0.05 },
-      { f: 369.99, t: 1.0, d: 0.8, v: 0.06 },
-      { f: 440.00, t: 1.6, d: 1.2, v: 0.07 },
-      { f: 392.00, t: 2.6, d: 0.8, v: 0.06 },
-      { f: 329.63, t: 3.4, d: 0.9, v: 0.06 },
-      { f: 293.66, t: 4.2, d: 1.5, v: 0.07 },
-    ];
-    playAcousticNote(ctx, 196.00, now, 5.0, 0.03, 'triangle');
-    notes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
-  } else if (stage === 3) {
-    const notes = [
-      { f: 329.63, t: 0.0, d: 0.7, v: 0.05 },
-      { f: 392.00, t: 0.6, d: 0.8, v: 0.06 },
-      { f: 493.88, t: 1.2, d: 0.9, v: 0.065 },
-      { f: 440.00, t: 1.9, d: 0.7, v: 0.06 },
-      { f: 392.00, t: 2.5, d: 0.8, v: 0.06 },
-      { f: 329.63, t: 3.2, d: 1.3, v: 0.07 },
-    ];
-    playAcousticNote(ctx, 164.81, now, 4.5, 0.03, 'triangle');
-    notes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
-  } else {
-    const notes = [
-      { f: 293.66, t: 0.0, d: 0.7, v: 0.05 },
-      { f: 369.99, t: 0.5, d: 0.7, v: 0.055 },
-      { f: 440.00, t: 1.0, d: 0.8, v: 0.06 },
-      { f: 587.33, t: 1.6, d: 1.2, v: 0.075 },
-      { f: 493.88, t: 2.6, d: 0.7, v: 0.06 },
-      { f: 440.00, t: 3.2, d: 0.8, v: 0.065 },
-      { f: 369.99, t: 3.9, d: 0.7, v: 0.055 },
-      { f: 293.66, t: 4.6, d: 1.6, v: 0.07 },
-    ];
-    playAcousticNote(ctx, 146.83, now, 5.5, 0.035, 'triangle');
-    notes.forEach((n) => playAcousticNote(ctx, n.f, now + n.t, n.d, n.v, 'sine'));
-  }
+  return sequence.loopMs;
 }
 
 /**
  * Start or switch music track for the given stage and theme.
  */
+function scheduleNextLoop(delayMs) {
+  const timer = setTimeout(() => {
+    if (!isMusicPlaying) return;
+    stopAllMusicAudio();
+    isMusicPlaying = true;
+    const nextLoopMs = playStageMelody(currentActiveStage, currentActiveTheme);
+    scheduleNextLoop(nextLoopMs);
+  }, delayMs);
+  activeMusicTimeouts.push(timer);
+}
+
 function beginPlaybackLoop(onStateChange = null) {
   stopAllMusicAudio();
   isMusicPlaying = true;
 
-  playStageMelody(currentActiveStage, currentActiveTheme);
-
-  const intervalTime = currentActiveTheme === 'cumpleanos' ? 9500 : 6200;
-  activeMusicInterval = setInterval(() => {
-    if (!isMusicPlaying) return;
-    stopAllMusicAudio();
-    isMusicPlaying = true;
-    playStageMelody(currentActiveStage, currentActiveTheme);
-  }, intervalTime);
+  const firstLoopMs = playStageMelody(currentActiveStage, currentActiveTheme);
+  scheduleNextLoop(firstLoopMs);
 
   if (onStateChange) onStateChange(true);
   notifyMusicListeners();

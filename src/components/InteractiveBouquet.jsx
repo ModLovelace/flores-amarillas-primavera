@@ -12,49 +12,101 @@ import {
 // Caché de formas temáticas para reutilizar instancias de canvas-confetti y alto rendimiento
 const THEMATIC_SHAPES_CACHE = new Map();
 
+function createVectorShape(path, matrix) {
+  try {
+    if (typeof confetti.shapeFromPath === 'function') {
+      return confetti.shapeFromPath({ path, matrix });
+    }
+  } catch {
+    // Fallback abajo si Path2D no está disponible
+  }
+  return null;
+}
+
+function tryTextShape(text, scalar) {
+  try {
+    if (typeof confetti.shapeFromText !== 'function' || typeof OffscreenCanvas === 'undefined') {
+      return null;
+    }
+    const shape = confetti.shapeFromText({ text, scalar });
+    if (shape && shape.bitmap && shape.bitmap.width > 0 && shape.bitmap.height > 0) {
+      return shape;
+    }
+  } catch {
+    // Safari / navegadores sin soporte completo OffscreenCanvas
+  }
+  return null;
+}
+
 function getThematicShapes(themeId) {
   if (THEMATIC_SHAPES_CACHE.has(themeId)) {
     return THEMATIC_SHAPES_CACHE.get(themeId);
   }
 
+  // En Safari/WebKit shapeFromText usa OffscreenCanvas + transferToImageBitmap y los emojis pueden fallar o frenar animación
+  const isSafariWebKit =
+    typeof navigator !== 'undefined' &&
+    /^((?!chrome|chromium|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+
+  const sparkle = createVectorShape(
+    'M10 0 Q10 10 20 10 Q10 10 10 20 Q10 10 0 10 Q10 10 10 0 Z',
+    [0.55, 0, 0, 0.55, -5.5, -5.5]
+  );
+  const heart = createVectorShape(
+    'M10 18 C10 18 1 12 1 6 C1 2.7 3.7 0.5 6.8 0.5 C8.5 0.5 9.5 1.4 10 2.6 C10.5 1.4 11.5 0.5 13.2 0.5 C16.3 0.5 19 2.7 19 6 C19 12 10 18 10 18 Z',
+    [0.58, 0, 0, 0.58, -5.8, -5.5]
+  );
+  const petal = createVectorShape(
+    'M10 0 C15 5 16 14 10 20 C4 14 5 5 10 0 Z',
+    [0.55, 0, 0, 0.55, -5.5, -5.5]
+  );
+  const ribbon = createVectorShape(
+    'M2 2 Q10 6 18 2 L20 7 Q10 11 0 7 Z',
+    [0.55, 0, 0, 0.55, -5.5, -3]
+  );
+
   const shapes = [];
-  try {
-    if (typeof confetti.shapeFromText === 'function') {
-      if (themeId === 'cumpleanos') {
-        shapes.push(
-          'square',
-          'circle',
-          confetti.shapeFromText({ text: '🎉', scalar: 1.8 }),
-          confetti.shapeFromText({ text: '🎂', scalar: 1.8 }),
-          confetti.shapeFromText({ text: '✨', scalar: 1.4 })
-        );
-      } else if (themeId === 'flores-amarillas') {
-        shapes.push(
-          'circle',
-          confetti.shapeFromText({ text: '🌻', scalar: 2.0 }),
-          confetti.shapeFromText({ text: '🌼', scalar: 1.8 }),
-          confetti.shapeFromText({ text: '✨', scalar: 1.4 })
-        );
-      } else if (themeId === 'logro-profesional') {
-        shapes.push(
-          'circle',
-          confetti.shapeFromText({ text: '🎓', scalar: 2.0 }),
-          confetti.shapeFromText({ text: '⭐', scalar: 1.8 }),
-          confetti.shapeFromText({ text: '🏆', scalar: 2.0 }),
-          confetti.shapeFromText({ text: '✨', scalar: 1.4 })
-        );
-      } else if (themeId === 'aniversario') {
-        shapes.push(
-          'circle',
-          confetti.shapeFromText({ text: '💖', scalar: 2.0 }),
-          confetti.shapeFromText({ text: '❤️', scalar: 1.8 }),
-          confetti.shapeFromText({ text: '🌹', scalar: 2.0 }),
-          confetti.shapeFromText({ text: '✨', scalar: 1.4 })
-        );
-      }
+  if (themeId === 'cumpleanos') {
+    shapes.push('square', 'circle', 'star');
+    if (sparkle) shapes.push(sparkle);
+    if (ribbon) shapes.push(ribbon);
+    if (!isSafariWebKit) {
+      ['🎉', '🎂', '✨'].forEach((emoji, i) => {
+        const s = tryTextShape(emoji, i === 2 ? 1.4 : 1.8);
+        if (s) shapes.push(s);
+      });
     }
-  } catch (err) {
-    // Si OffscreenCanvas no está soportado en algún navegador, degradación suave
+  } else if (themeId === 'flores-amarillas') {
+    shapes.push('circle');
+    if (petal) shapes.push(petal);
+    if (sparkle) shapes.push(sparkle);
+    if (!isSafariWebKit) {
+      ['🌻', '🌼', '✨'].forEach((emoji, i) => {
+        const s = tryTextShape(emoji, i === 0 ? 2.0 : i === 1 ? 1.8 : 1.4);
+        if (s) shapes.push(s);
+      });
+    }
+  } else if (themeId === 'logro-profesional') {
+    shapes.push('circle', 'star');
+    if (sparkle) shapes.push(sparkle);
+    if (ribbon) shapes.push(ribbon);
+    if (!isSafariWebKit) {
+      ['🎓', '⭐', '🏆', '✨'].forEach((emoji, i) => {
+        const s = tryTextShape(emoji, i === 3 ? 1.4 : 1.9);
+        if (s) shapes.push(s);
+      });
+    }
+  } else if (themeId === 'aniversario') {
+    shapes.push('circle');
+    if (heart) shapes.push(heart);
+    if (petal) shapes.push(petal);
+    if (sparkle) shapes.push(sparkle);
+    if (!isSafariWebKit) {
+      ['💖', '❤️', '🌹', '✨'].forEach((emoji, i) => {
+        const s = tryTextShape(emoji, i === 3 ? 1.4 : 1.9);
+        if (s) shapes.push(s);
+      });
+    }
   }
 
   if (shapes.length === 0) {
@@ -142,14 +194,29 @@ export default function InteractiveBouquet({
   const canvasRef = useRef(null);
   const cannonRef = useRef(null);
   const prevThemeIdRef = useRef(theme.id);
+  const bloomTimerRef = useRef(null);
 
   useEffect(() => {
     return () => {
+      if (bloomTimerRef.current) {
+        clearTimeout(bloomTimerRef.current);
+      }
       if (cannonRef.current) {
         cannonRef.current.reset();
         cannonRef.current = null;
       }
     };
+  }, []);
+
+  const playCenterpiecePulse = useCallback(() => {
+    if (bloomTimerRef.current) {
+      clearTimeout(bloomTimerRef.current);
+    }
+    setIsBloomingAnimation(false);
+    requestAnimationFrame(() => {
+      setIsBloomingAnimation(true);
+      bloomTimerRef.current = setTimeout(() => setIsBloomingAnimation(false), 1150);
+    });
   }, []);
 
   // Ráfaga de partículas confinada estrictamente al canvas local de la pieza central
@@ -213,8 +280,7 @@ export default function InteractiveBouquet({
     const nextStage = bloomStage >= 4 ? 1 : bloomStage + 1;
     setBloomStage(nextStage);
     setBloomCount((prev) => prev + 1);
-    setIsBloomingAnimation(true);
-    setTimeout(() => setIsBloomingAnimation(false), 1350);
+    playCenterpiecePulse();
 
     // Start or advance melody for the active theme
     startMovieMusic(nextStage, theme.id);
@@ -278,7 +344,7 @@ export default function InteractiveBouquet({
           if (e.key === 'Enter' || e.key === ' ') triggerBloom();
         }}
         title="Toca para interactuar y florecer"
-        className="relative w-full max-w-[340px] sm:max-w-[440px] h-[390px] sm:h-[460px] flex items-center justify-center transition-all duration-700 cursor-pointer overflow-hidden rounded-3xl select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+        className="safari-layer-clip relative w-full max-w-[340px] sm:max-w-[440px] h-[390px] sm:h-[460px] flex items-center justify-center transition-all duration-700 cursor-pointer overflow-hidden rounded-3xl select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
       >
         {/* Canvas de partículas temáticas confinado estrictamente a la pieza central */}
         <canvas
@@ -288,15 +354,17 @@ export default function InteractiveBouquet({
         
         {/* Render Centerpiece according to theme */}
         <div className="w-full h-full flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
-          {theme.id === 'cumpleanos' ? (
-            <BirthdayCakeSVG bloomStage={bloomStage} />
-          ) : theme.id === 'logro-profesional' ? (
-            <TrophyLaurelSVG bloomStage={bloomStage} />
-          ) : theme.id === 'aniversario' ? (
-            <RosesBouquetSVG bloomStage={bloomStage} />
-          ) : (
-            <SunflowerBouquetSVG bloomStage={bloomStage} />
-          )}
+          <div className={`w-full h-full flex items-center justify-center ${isBloomingAnimation ? 'animate-botanical-bloom' : ''}`}>
+            {theme.id === 'cumpleanos' ? (
+              <BirthdayCakeSVG bloomStage={bloomStage} />
+            ) : theme.id === 'logro-profesional' ? (
+              <TrophyLaurelSVG bloomStage={bloomStage} />
+            ) : theme.id === 'aniversario' ? (
+              <RosesBouquetSVG bloomStage={bloomStage} />
+            ) : (
+              <SunflowerBouquetSVG bloomStage={bloomStage} />
+            )}
+          </div>
         </div>
       </div>
 
@@ -333,14 +401,17 @@ export default function InteractiveBouquet({
                   const targetStage = idx + 1;
                   setBloomStage(targetStage);
                   setBloomCount((c) => c + 1);
+                  playCenterpiecePulse();
                   fireThematicParticles(theme.id, targetStage);
                   switchMovieStageMusic(targetStage, theme.id);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
                     const targetStage = idx + 1;
                     setBloomStage(targetStage);
                     setBloomCount((c) => c + 1);
+                    playCenterpiecePulse();
                     fireThematicParticles(theme.id, targetStage);
                     switchMovieStageMusic(targetStage, theme.id);
                   }
@@ -405,18 +476,20 @@ export default function InteractiveBouquet({
 
       {/* Action Button & Ripple */}
       <div className="mt-6 flex flex-col items-center gap-3 z-10 relative">
-        {showRippleWave && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-14 rounded-full border-2 border-amber-400 animate-forcefield-wave pointer-events-none" />
-        )}
+        <div className="relative inline-flex items-center justify-center">
+          {showRippleWave && (
+            <div className="absolute inset-0 rounded-full border-2 border-amber-400 animate-forcefield-wave pointer-events-none" />
+          )}
 
-        <button
-          onClick={triggerBloom}
-          className={`group relative inline-flex items-center justify-center gap-2.5 sm:gap-3.5 px-6 sm:px-9 py-3.5 sm:py-4 rounded-full font-sans font-bold text-base sm:text-lg shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 overflow-hidden max-w-[92vw] ${theme.palette.buttonGradient}`}
-        >
-          <Droplets className="w-5 h-5 text-stone-900 animate-bounce group-hover:rotate-12 transition-transform" />
-          <span className="relative z-10">{theme.actionButton}</span>
-          <Sparkles className="w-5 h-5 text-stone-900 group-hover:rotate-45 transition-transform" />
-        </button>
+          <button
+            onClick={triggerBloom}
+            className={`group relative inline-flex items-center justify-center gap-2.5 sm:gap-3.5 px-6 sm:px-9 py-3.5 sm:py-4 rounded-full font-sans font-bold text-base sm:text-lg shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 overflow-hidden max-w-[92vw] ${theme.palette.buttonGradient}`}
+          >
+            <Droplets className="w-5 h-5 text-stone-900 animate-bounce group-hover:rotate-12 transition-transform" />
+            <span className="relative z-10">{theme.actionButton}</span>
+            <Sparkles className="w-5 h-5 text-stone-900 group-hover:rotate-45 transition-transform" />
+          </button>
+        </div>
 
         <p className="text-xs sm:text-sm text-stone-500 font-sans text-center max-w-md">
           {bloomCount === 0 ? theme.actionSubtext : theme.counterText(bloomCount, recipientName)}
