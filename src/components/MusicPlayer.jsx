@@ -1,24 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause } from 'lucide-react';
 import {
+  attemptAutoplayMusic,
+  startMovieMusic,
   toggleMovieMusic,
   stopMovieMusic,
   subscribeMusicState,
+  isUserPausedMusic,
   getTrackInfo,
 } from '../utils/audioChimes';
 
+const UNLOCK_EVENTS = ['pointerdown', 'touchend', 'click', 'keydown'];
+
 export default function MusicPlayer({ bloomStage = 1, themeId = 'flores-amarillas' }) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const stageRef = useRef(bloomStage);
+  const themeRef = useRef(themeId);
+
+  useEffect(() => {
+    stageRef.current = bloomStage;
+    themeRef.current = themeId;
+  }, [bloomStage, themeId]);
 
   // Active track corresponding to current bloom stage and theme
   const currentTrack = getTrackInfo(bloomStage, themeId);
 
-  // Subscribe to audio state
+  // Subscribe to audio state & auto-start melody on mount or first user gesture
   useEffect(() => {
+    const removeUnlockListeners = () => {
+      UNLOCK_EVENTS.forEach((evt) => {
+        window.removeEventListener(evt, handleFirstInteraction, { capture: true });
+      });
+    };
+
+    function handleFirstInteraction(event) {
+      if (isUserPausedMusic()) {
+        removeUnlockListeners();
+        return;
+      }
+      // Let MusicPlayer's own button/click handler manage play/pause directly without double-toggling
+      if (event.target instanceof Element && event.target.closest('[data-music-player]')) {
+        return;
+      }
+      startMovieMusic(stageRef.current, themeRef.current);
+    }
+
     const unsubscribe = subscribeMusicState((playing) => {
       setIsPlaying(playing);
+      if (playing || isUserPausedMusic()) {
+        removeUnlockListeners();
+      }
     });
+
+    const startedImmediately = attemptAutoplayMusic(stageRef.current, themeRef.current);
+    if (!startedImmediately && !isUserPausedMusic()) {
+      UNLOCK_EVENTS.forEach((evt) => {
+        window.addEventListener(evt, handleFirstInteraction, { capture: true, passive: true });
+      });
+    }
+
     return () => {
+      removeUnlockListeners();
       unsubscribe();
       stopMovieMusic();
     };
@@ -33,6 +75,7 @@ export default function MusicPlayer({ bloomStage = 1, themeId = 'flores-amarilla
 
   return (
     <aside
+      data-music-player
       aria-label="Reproductor de Música Ambiental"
       className="fixed bottom-4 right-3 sm:bottom-5 sm:right-6 z-40 flex items-center gap-2.5 sm:gap-3 bg-white/95 backdrop-blur-md pl-2.5 pr-3 sm:pl-3 sm:pr-4 py-2 sm:py-2.5 rounded-full border border-stone-200 shadow-polaroid hover:shadow-xl transition-all duration-300 max-w-[calc(100vw-1.5rem)] sm:max-w-none"
     >

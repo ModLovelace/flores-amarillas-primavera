@@ -12,9 +12,9 @@ export default function Watermark() {
   return (
     <aside
       aria-label="Créditos del desarrollador"
-      className="fixed bottom-20 right-3 sm:bottom-5 sm:left-6 z-40 pointer-events-none select-none"
+      className="fixed bottom-[88px] right-3 sm:bottom-5 sm:left-6 sm:right-auto z-40 pointer-events-none select-none w-fit"
     >
-      <div className="pointer-events-auto backdrop-blur-md bg-white/95 hover:bg-amber-50/70 text-stone-700 border border-stone-200/90 hover:border-amber-400/60 shadow-xl rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 flex items-center gap-2 text-[11px] font-mono transition-all duration-200 opacity-90 hover:opacity-100 group">
+      <div className="pointer-events-auto w-fit backdrop-blur-md bg-white/95 hover:bg-amber-50/70 text-stone-700 border border-stone-300/80 hover:border-amber-400/60 shadow-xl rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 inline-flex items-center gap-2 text-[11px] font-mono transition-all duration-200 opacity-90 hover:opacity-100 group">
         {/* Enlace y Monograma */}
         <a
           href="https://modlovelace.com"

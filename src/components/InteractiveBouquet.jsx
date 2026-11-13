@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { Sparkles, Droplets } from 'lucide-react';
-import { switchMovieStageMusic } from '../utils/audioChimes';
+import { startMovieMusic, switchMovieStageMusic } from '../utils/audioChimes';
 import {
   SunflowerBouquetSVG,
   BirthdayCakeSVG,
@@ -216,8 +216,8 @@ export default function InteractiveBouquet({
     setIsBloomingAnimation(true);
     setTimeout(() => setIsBloomingAnimation(false), 1350);
 
-    // Switch melody for the active theme
-    switchMovieStageMusic(nextStage, theme.id);
+    // Start or advance melody for the active theme
+    startMovieMusic(nextStage, theme.id);
 
     // Disparo festivo temático confinado estrictamente al espacio de la flor / torta / trofeo / rosas
     fireThematicParticles(theme.id, nextStage);

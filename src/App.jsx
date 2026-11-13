@@ -182,7 +182,7 @@ export default function App() {
       </main>
 
       {/* Aesthetic Footer */}
-      <footer className="relative z-10 mt-16 py-10 border-t border-stone-200/60 bg-white/40 text-center text-stone-600 text-xs sm:text-sm">
+      <footer className="relative z-10 mt-16 pt-10 pb-36 sm:pb-24 border-t border-stone-200/60 bg-white/40 text-center text-stone-600 text-xs sm:text-sm">
         <div className="max-w-4xl mx-auto px-4 flex flex-col items-center gap-3">
           <div className="flex items-center gap-2 text-stone-800 font-serif text-base font-semibold">
             <span>{currentTheme.emoji}</span>
@@ -190,7 +190,7 @@ export default function App() {
             <span>{currentTheme.emoji}</span>
           </div>
           <p className="font-handwriting text-xl text-stone-700 max-w-md">
-            "Que cada día de tu vida tenga el color, la luz y la calidez del sol primaveral."
+            "{currentTheme.tagline}"
           </p>
           <div className="pt-2 text-stone-400 text-xs flex items-center gap-1">
             <span>Hecho con</span>

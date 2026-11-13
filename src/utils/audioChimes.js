@@ -9,6 +9,9 @@ let currentActiveStage = 1;
 let currentActiveTheme = 'flores-amarillas';
 const musicListeners = new Set();
 
+let userPaused = false;
+let startRequestId = 0;
+
 function getAudioContext() {
   if (!audioCtx) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -17,9 +20,17 @@ function getAudioContext() {
     }
   }
   if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
+    audioCtx.resume().catch(() => {});
   }
   return audioCtx;
+}
+
+export function isUserPausedMusic() {
+  return userPaused;
+}
+
+export function isAudioUnlocked() {
+  return Boolean(audioCtx && audioCtx.state === 'running');
 }
 
 function getMusicMasterGain(ctx) {
@@ -395,37 +406,93 @@ function playStageMelody(stage, theme = 'flores-amarillas') {
 /**
  * Start or switch music track for the given stage and theme.
  */
-export function startMovieMusic(stage = 1, theme = null, onStateChange = null) {
+function beginPlaybackLoop(onStateChange = null) {
+  stopAllMusicAudio();
+  isMusicPlaying = true;
+
+  playStageMelody(currentActiveStage, currentActiveTheme);
+
+  const intervalTime = currentActiveTheme === 'cumpleanos' ? 9500 : 6200;
+  activeMusicInterval = setInterval(() => {
+    if (!isMusicPlaying) return;
+    stopAllMusicAudio();
+    isMusicPlaying = true;
+    playStageMelody(currentActiveStage, currentActiveTheme);
+  }, intervalTime);
+
+  if (onStateChange) onStateChange(true);
+  notifyMusicListeners();
+  return true;
+}
+
+/**
+ * Attempt automatic playback on page open.
+ * Only marks playback active once AudioContext is genuinely running (never fakes state while suspended).
+ */
+export function attemptAutoplayMusic(stage = 1, theme = null, onStateChange = null) {
   try {
+    currentActiveStage = stage;
+    if (theme) currentActiveTheme = theme;
+    if (userPaused || isMusicPlaying) return isMusicPlaying;
+
     const ctx = getAudioContext();
     if (!ctx) return false;
 
-    stopAllMusicAudio();
+    if (ctx.state === 'running') {
+      return beginPlaybackLoop(onStateChange);
+    }
 
+    const requestId = ++startRequestId;
+    ctx
+      .resume()
+      .then(() => {
+        if (requestId !== startRequestId || userPaused || isMusicPlaying) return;
+        if (ctx.state === 'running') {
+          beginPlaybackLoop(onStateChange);
+        }
+      })
+      .catch(() => {});
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+export function startMovieMusic(stage = 1, theme = null, onStateChange = null) {
+  try {
+    userPaused = false;
     currentActiveStage = stage;
     if (theme) currentActiveTheme = theme;
-    isMusicPlaying = true;
 
-    playStageMelody(currentActiveStage, currentActiveTheme);
+    const ctx = getAudioContext();
+    if (!ctx) return false;
 
-    const intervalTime = currentActiveTheme === 'cumpleanos' ? 9500 : 6200;
-    activeMusicInterval = setInterval(() => {
-      if (!isMusicPlaying) return;
-      stopAllMusicAudio();
-      isMusicPlaying = true;
-      playStageMelody(currentActiveStage, currentActiveTheme);
-    }, intervalTime);
+    if (ctx.state === 'running') {
+      return beginPlaybackLoop(onStateChange);
+    }
 
-    if (onStateChange) onStateChange(true);
-    notifyMusicListeners();
-    return true;
+    const requestId = ++startRequestId;
+    ctx
+      .resume()
+      .then(() => {
+        if (requestId !== startRequestId || userPaused) return;
+        if (ctx.state === 'running') {
+          beginPlaybackLoop(onStateChange);
+        }
+      })
+      .catch(() => {});
+
+    return false;
   } catch (err) {
     console.warn('Start movie music error:', err);
     return false;
   }
 }
 
-export function stopMovieMusic(onStateChange = null) {
+export function stopMovieMusic(onStateChange = null, { byUser = false } = {}) {
+  startRequestId++;
+  if (byUser) userPaused = true;
   isMusicPlaying = false;
   stopAllMusicAudio();
   if (onStateChange) onStateChange(false);
@@ -435,7 +502,7 @@ export function stopMovieMusic(onStateChange = null) {
 
 export function toggleMovieMusic(stage = 1, theme = null, onStateChange = null) {
   if (isMusicPlaying) {
-    return stopMovieMusic(onStateChange);
+    return stopMovieMusic(onStateChange, { byUser: true });
   } else {
     return startMovieMusic(stage, theme, onStateChange);
   }
